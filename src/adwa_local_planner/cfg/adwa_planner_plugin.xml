@@ -1,0 +1,5 @@
+<library path="lib/libadwa_local_planner">
+    <class name="adwa_local_planner/ADWAPlannerROS" type="adwa_local_planner::ADWAPlannerROS" base_class_type="nav_core::BaseLocalPlanner">
+        <description>This is adaptive dynamic window approach planner plugin for ROS.</description>
+    </class>
+</library>

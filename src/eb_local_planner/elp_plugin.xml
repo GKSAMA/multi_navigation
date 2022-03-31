@@ -1,0 +1,7 @@
+<library path="lib/libeb_local_planner">
+    <class name="eb_local_planner/EBPlannerROS" type="eb_local_planner::EBPlannerROS" base_class_type="nav_core::BaseLocalPlanner">
+        <description>
+            Elastic Band Plugin for BaseLocalPlanner.
+        </description>
+    </class>
+</library>

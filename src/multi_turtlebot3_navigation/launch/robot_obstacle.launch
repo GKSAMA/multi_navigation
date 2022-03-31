@@ -1,0 +1,36 @@
+<launch>
+  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="ob0"  default="ob0"/>
+  <arg name="ob1" default="ob1"/>
+  <!-- <arg name="ob2" default="ob2"/> -->
+
+  <arg name="ob0_x_pos" default="2.0"/>
+  <arg name="ob0_y_pos" default="40.0"/>
+  <arg name="ob0_z_pos" default="0.0"/>
+  <arg name="ob0_yaw"   default="1.5708"/>
+
+  <arg name="ob1_x_pos" default="6.0"/>
+  <arg name="ob1_y_pos" default="28.0"/>
+  <arg name="ob1_z_pos" default="0.0"/>
+  <arg name="ob1_yaw"   default="1.5708"/>
+
+  <group ns = "$(arg ob0)">
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find multi_turtlebot3_navigation)/models/tb3/turtlebot3_$(arg model).urdf.xacro" />
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="$(arg ob0)" />
+    </node>
+    
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg ob0) -x $(arg ob0_x_pos) -y $(arg ob0_y_pos) -z $(arg ob0_z_pos) -Y $(arg ob0_yaw) -param robot_description" />
+  </group>
+  <group ns = "$(arg ob1)">
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find multi_turtlebot3_navigation)/models/tb3/turtlebot3_$(arg model).urdf.xacro" />
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="$(arg ob1)" />
+    </node>
+    
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg ob1) -x $(arg ob1_x_pos) -y $(arg ob1_y_pos) -z $(arg ob1_z_pos) -Y $(arg ob1_yaw) -param robot_description" />
+  </group>
+
+</launch>
