@@ -2,8 +2,8 @@
 
 ## build
 
-catkin_make
-source devel/setup.bash
+catkin_make  
+source devel/setup.bash  
 
 ## Prepare
 
@@ -19,5 +19,5 @@ rosrun multi_turtlebot3_navigation multi_showpath
 rosrun multi_turtlebot3_navigation navigation_by_waypoints
 (data record)
 rosrun multi_turtlebot3_navigation datarecord
-(standard show)
+(standard show)  
 rosrun multi_turtlebot3_navigation showdata
