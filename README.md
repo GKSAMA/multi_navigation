@@ -11,13 +11,13 @@ source devel/setup.bash
 
 ## 运行：
 
-roslaunch multi_turtlebot3_navigation multi_turtlebot3_gazebo.launch
-roslaunch multi_turtlebot3_navigation move_base_three.launch
-roslaunch multi_turtlebot3_navigation navigation_three.launch
-(optional)
-rosrun multi_turtlebot3_navigation multi_showpath
-rosrun multi_turtlebot3_navigation navigation_by_waypoints
-(data record)
-rosrun multi_turtlebot3_navigation datarecord
+roslaunch multi_turtlebot3_navigation multi_turtlebot3_gazebo.launch  
+roslaunch multi_turtlebot3_navigation move_base_three.launch  
+roslaunch multi_turtlebot3_navigation navigation_three.launch  
+(optional)  
+rosrun multi_turtlebot3_navigation multi_showpath  
+rosrun multi_turtlebot3_navigation navigation_by_waypoints  
+(data record)  
+rosrun multi_turtlebot3_navigation datarecord  
 (standard show)  
-rosrun multi_turtlebot3_navigation showdata
+rosrun multi_turtlebot3_navigation showdata  
