@@ -163,6 +163,10 @@ add_executable(datarecord src/datarecord.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(multi_nav_utils ${${PROJECT_NAME}_EXPORTED_TARGETS})
+add_dependencies(nav_by_waypoints ${${PROJECT_NAME}_EXPORTED_TARGETS})
+add_dependencies(multi_showpath ${${PROJECT_NAME}_EXPORTED_TARGETS})
+add_dependencies(datarecord ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
