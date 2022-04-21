@@ -9,6 +9,9 @@ source devel/setup.bash
 
 将src/multi_turtlebot3_navigation/lib下的动态库copy至 /usr/lib/x86_64-linux-gnu/gazebo-9/plugins/目录下
 
+需要对每个终端添加变量 `TURTLEBOT3_MODEL=burger`
+或者直接在.bashrc中添加 `export TURTLEBOT3_MODEL=burger`
+
 ## 运行：
 
 roslaunch multi_turtlebot3_navigation multi_turtlebot3_gazebo.launch  
