@@ -2,14 +2,13 @@
 
 ## build
 
-catkin_make
-source devel/setup.bash
+catkin_make  
+source devel/setup.bash  
 
 ## Prepare
 
 1. 将src/multi_turtlebot3_navigation/lib下的动态库copy至 /usr/lib/x86_64-linux-gnu/gazebo-9/plugins/目录下
-2. 需要对每个终端添加变量 `TURTLEBOT3_MODEL=burger`
-   或者直接在.bashrc中添加 `export TURTLEBOT3_MODEL=burger`
+2. 需要对每个终端添加变量 `TURTLEBOT3_MODEL=burger`  `或者直接在.bashrc中添加 `export TURTLEBOT3_MODEL=burger`
 3. 在src下运行git clone https://github.com/locusrobotics/robot_navigation.git 以使用dwb_local_planner
 
 ## 运行(turtlebot)：
@@ -22,5 +21,5 @@ rosrun multi_turtlebot3_navigation multi_showpath
 rosrun multi_turtlebot3_navigation navigation_by_waypoints
 (data record)
 rosrun multi_turtlebot3_navigation datarecord
-(standard show)
+(standard show)  
 rosrun multi_turtlebot3_navigation showdata
