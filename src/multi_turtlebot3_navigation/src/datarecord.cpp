@@ -82,9 +82,12 @@ int main(int argc, char** argv){
     shmid = shmget((key_t)1234, sizeof(struct MultiNavUtil::runstate), 0666 | IPC_CREAT);
     shared_memory = shmat(shmid, (void*)0, 0);
     rs = (struct MultiNavUtil::runstate*)shared_memory;
+    // reset shared memory
+    rs->idx = -1;
     ros::Subscriber scansub0 = nh.subscribe<sensor_msgs::LaserScan>("/tb3_0/scan",100,boost::bind(&scanCB,_1,rs,0));
     ros::Subscriber scansub1 = nh.subscribe<sensor_msgs::LaserScan>("/tb3_1/scan",100,boost::bind(&scanCB,_1,rs,1));
     ros::Subscriber scansub2 = nh.subscribe<sensor_msgs::LaserScan>("/tb3_2/scan",100,boost::bind(&scanCB,_1,rs,2));
+    ros::Subscriber scansub3 = nh.subscribe<sensor_msgs::LaserScan>("/tb3_3/scan",100,boost::bind(&scanCB,_1,rs,3));
     ros::Subscriber footprintsub0 = nh.subscribe<geometry_msgs::PolygonStamped>
                                                     ("/tb3_0/move_base/global_costmap/footprint",
                                                     100,
@@ -97,8 +100,13 @@ int main(int argc, char** argv){
                                                     ("/tb3_2/move_base/global_costmap/footprint",
                                                     100,
                                                     boost::bind(&fpCB,_1,rs,2));
+    ros::Subscriber footprintsub3 = nh.subscribe<geometry_msgs::PolygonStamped>
+                                                    ("/tb3_3/move_base/global_costmap/footprint",
+                                                    100,
+                                                    boost::bind(&fpCB,_1,rs,3));
     ros::Subscriber odomsub0 = nh.subscribe<nav_msgs::Odometry>("/tb3_0/odom",100,boost::bind(&odomCB,_1,rs,0));
     ros::Subscriber odomsub1 = nh.subscribe<nav_msgs::Odometry>("/tb3_1/odom",100,boost::bind(&odomCB,_1,rs,1));
     ros::Subscriber odomsub2 = nh.subscribe<nav_msgs::Odometry>("/tb3_2/odom",100,boost::bind(&odomCB,_1,rs,2));
+    ros::Subscriber odomsub3 = nh.subscribe<nav_msgs::Odometry>("/tb3_3/odom",100,boost::bind(&odomCB,_1,rs,3));
     ros::spin();
 }

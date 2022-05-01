@@ -7,11 +7,25 @@ import sys
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
+waypointspath = "/home/gk/Documents/multi_turtlebot3_navigation/src/multi_turtlebot3_navigation/config/waypoints.data"
 datapath = "/home/gk/Documents/DataRecord"
 distdatafile = "dist.data"
 pose2ddatafile = "pose2Ddata.data"
 veldatafile = "veldata.data"
 segtimedatafile = "segtime.data"
+
+def load_waypoints_data(datafile):
+    datas = []
+    with open(waypointspath, 'r') as f:
+        for line in f.readlines():
+            line_data = line.split(' ')
+            line_data[0] = float(line_data[0])
+            line_data[1] = float(line_data[1])
+            line_data[2] = float(line_data[2])
+            line_data[3] = float(line_data[3])
+            datas.append(line_data)
+    print(datas)
+    return datas
 
 # data format : ["time" "data" "idx"]
 def load_data(datafile):
@@ -130,13 +144,14 @@ def dist2ObsDrawLine(datas, labels,maxdatacounts):
     plt.plot(x,y[0],c='blue',label='robot'+str(labels[0]))
     plt.plot(x,y[1],c='green',label='robot'+str(labels[1]))
     plt.plot(x,y[2],c='red',label='robot'+str(labels[2]))
+    plt.plot(x,y[3],c='orange',label='robot'+str(labels[3]))
     plt.legend(loc='best')
     plt.xlabel('Time/s')
     plt.ylabel('Dist/m')
     plt.title('Distance to the nearest obstacle',fontdict={'size':20})
     plt.show()
 
-def poseDrawLine(datas, labels, maxdatacounts):
+def poseDrawLine(datas, maxdatacounts):
     x = list(range(maxdatacounts))
     y = []
     datax = []
@@ -157,7 +172,8 @@ def poseDrawLine(datas, labels, maxdatacounts):
         y.append(deepcopy(robotdata))
         robotdata = []
     fig,axs = plt.subplots(nrows = len(y[0]), ncols = 1,figsize=(20,6),dpi = 70)
-    colors = ['blue','green','red']
+    labels = ['eband','dwa','teb','dwb']
+    colors = ['blue','green','red','orange']
     datalabels = ['x','y','theta']
     for i in range(len(y[0])):
         for j in range(len(y)):
@@ -196,16 +212,20 @@ def totlalDistDraw(datas,labels,maxdatacounts):
         sumdist = 0
         waypoint = 1
     # print(y)
-    bar_width = 0.3
-    plt.bar(x=x,height=y[0],label='robot'+str(labels[0]),color='blue',alpha=0.8,width = bar_width)
-    plt.bar(x=np.array(x)+bar_width,height=y[1],label="robot"+str(labels[1]),color='green',alpha=0.8,width = bar_width)
-    plt.bar(x=np.array(x)+2*bar_width,height=y[2],label="robot"+str(labels[2]),color='red',alpha=0.8,width = bar_width)
+    bar_width = 0.25
+    plt.bar(x=x,height=y[0],label='eband',color='blue',alpha=0.8,width = bar_width)
+    plt.bar(x=np.array(x)+bar_width,height=y[1],label="dwa",color='green',alpha=0.8,width = bar_width)
+    plt.bar(x=np.array(x)+2*bar_width,height=y[2],label="teb",color='red',alpha=0.8,width = bar_width)
+    plt.bar(x=np.array(x)+3*bar_width,height=y[3],label="dwb",color='orange',alpha=0.8,width = bar_width)
+    
     for x1,yy in enumerate(y[0]):
         plt.text(x1,yy+1,str(yy),ha='center',va='bottom',fontsize=12,rotation=0)
     for x1,yy in enumerate(y[1]):
         plt.text(x1+bar_width,yy+1,str(yy),ha='center',va='bottom',fontsize=12,rotation=0)
     for x1,yy in enumerate(y[2]):
         plt.text(x1+2*bar_width,yy+1,str(yy),ha='center',va='bottom',fontsize=12,rotation=0)
+    for x1,yy in enumerate(y[3]):
+        plt.text(x1+3*bar_width,yy+1,str(yy),ha='center',va='bottom',fontsize=12,rotation=0)
     plt.xlabel('waypoint')
     plt.ylabel('distance/m')
     plt.legend(loc='best')
@@ -213,7 +233,7 @@ def totlalDistDraw(datas,labels,maxdatacounts):
     plt.show()
     pass
 
-def velDrawLine(datas,labels,maxdatacounts):
+def velDrawLine(datas,maxdatacounts):
     x = list(range(maxdatacounts))
     y = []
     datax = []
@@ -230,16 +250,41 @@ def velDrawLine(datas,labels,maxdatacounts):
         y.append(deepcopy(robotdata))
         robotdata = []
     fig,axs = plt.subplots(nrows = len(y[0]), ncols = 1,figsize=(20,6),dpi = 70)
-    colors = ['blue','green','red']
+    labels = ['eband','dwa','teb','dwb']
+    colors = ['blue','green','red','orange']
     datalabels = ['x','theta']
     for i in range(len(y[0])):
         for j in range(len(y)):
-            axs[i].plot(x,y[j][i],c=colors[j],label="robot"+str(labels[j])+datalabels[i])
+            axs[i].plot(x,y[j][i],c=colors[j],label=str(labels[j])+datalabels[i])
         axs[i].legend(loc='best')
         axs[i].set_xlabel('Time/s',fontdict={'size':16})
         axs[i].set_ylabel('linear/ m/s' if datalabels[i]=='x' else 'angular/ rad/s',fontdict={'size':16})
     fig.autofmt_xdate()
     plt.title('Velocity Information',fontdict={'size':20})
+    plt.show()
+
+def accDrawLine(datas,labels,maxdatacounts):
+    x = list(range(maxdatacounts)-1)
+    y = []
+    acctemp = []
+    for i in range(len(datas)):
+        for j in range(1,len(datas[i])):
+            velxdiff = datas[i][j][1] - datas[i][j-1][1]
+            velthdiff = datas[i][j][3] - datas[i][j-1][3]
+            timediff = datas[i][j][0] - datas[i][j-1][0]
+            accx = velxdiff/timediff
+            acctemp.append(accx)
+        y.append(acctemp)
+        acctemp = []
+    plt.figure(figsize=(20,10),dpi=70)
+    plt.plot(x,y[0],c='blue',label='eband')
+    plt.plot(x,y[1],c='green',label='dwa')
+    plt.plot(x,y[2],c='red',label='teb')
+    plt.plot(x,y[3],c='orange',label='dwb')
+    plt.legend(loc='best')
+    plt.xlabel('Time/s')
+    plt.ylabel('Acc/(m^2/s)')
+    plt.title("Accleration Information",fontdict={'size':20})
     plt.show()
 
 def segTimeDrawLine(datas,labels,maxdatacounts):
@@ -248,27 +293,63 @@ def segTimeDrawLine(datas,labels,maxdatacounts):
     for data in datas:
         data = np.array(data)
         y.append(data[:,0])
-    bar_width = 0.3
-    plt.bar(x=x,height=y[0],label='robot'+str(labels[0]),color='blue',alpha=0.8,width = bar_width)
-    plt.bar(x=np.array(x)+bar_width,height=y[1],label="robot"+str(labels[1]),color='green',alpha=0.8,width = bar_width)
-    plt.bar(x=np.array(x)+2*bar_width,height=y[2],label="robot"+str(labels[2]),color='red',alpha=0.8,width = bar_width)
+    bar_width = 0.25
+    plt.bar(x=x,height=y[0],label='eband',color='blue',alpha=0.8,width = bar_width)
+    plt.bar(x=np.array(x)+bar_width,height=y[1],label="dwa",color='green',alpha=0.8,width = bar_width)
+    plt.bar(x=np.array(x)+2*bar_width,height=y[2],label="teb",color='red',alpha=0.8,width = bar_width)
+    plt.bar(x=np.array(x)+3*bar_width,height=y[3],label="dwb",color='orange',alpha=0.8,width = bar_width)
     for x1,yy in enumerate(y[0]):
         plt.text(x1,yy+1,str(yy),ha='center',va='bottom',fontsize=12,rotation=0)
     for x1,yy in enumerate(y[1]):
         plt.text(x1+bar_width,yy+1,str(yy),ha='center',va='bottom',fontsize=12,rotation=0)
     for x1,yy in enumerate(y[2]):
         plt.text(x1+2*bar_width,yy+1,str(yy),ha='center',va='bottom',fontsize=12,rotation=0)
+    for x1,yy in enumerate(y[3]):
+        plt.text(x1+3*bar_width,yy+1,str(yy),ha='center',va='bottom',fontsize=12,rotation=0)
     plt.xlabel('waypoint')
     plt.ylabel('time/s')
     plt.legend(loc='best')
     plt.title('Every Segment Time Cost',fontdict={'size':20})
     plt.show()
 
+def distanceToGoalDrawLine(waypointsdatas,posedatas,labels,maxdatacounts):
+    x = list(range(maxdatacounts))
+    y = []
+    distlist = []
+    print(len(posedatas[0]),len(posedatas[1]),len(posedatas[2]),len(posedatas[3]))
+    for i in range(len(posedatas)):
+        home = [posedatas[i][0][1],posedatas[i][0][2]]
+        for j in range(len(posedatas[i])):
+            pose = [posedatas[i][j][1], posedatas[i][j][2], 0]
+            # orientation = [0, 0, data[3], data[4]]
+            # yaw = math.atan2(2 * (orientation[3] * orientation[2] + orientation[0] * orientation[1]), 1 - 2*(orientation[2] * orientation[2] + orientation[1] * orientation[1]))
+            wpidx = (int)(posedatas[i][j][4]-1)
+            # print(wpidx)
+            if(wpidx != len(waypointsdatas)):
+                dist = math.sqrt((pose[0]-waypointsdatas[wpidx][0])*(pose[0]-waypointsdatas[wpidx][0]) + (pose[1]-waypointsdatas[wpidx][1])*(pose[1]-waypointsdatas[wpidx][1]))
+            else:
+                dist = math.sqrt((pose[0]-home[0])*(pose[0]-home[0]) + (pose[1]-home[1])*(pose[1] - home[1]))
+            distlist.append(dist)
+        y.append(distlist)
+        distlist = []
+    plt.figure(figsize=(20,10),dpi=70)
+    plt.plot(x,y[0],c='blue',label="eband")
+    plt.plot(x,y[1],c='green',label='dwa')
+    plt.plot(x,y[2],c='red',label='teb')
+    plt.plot(x,y[3],c='orange',label='dwb')
+    plt.legend(loc='best')
+    plt.xlabel("Time/s")
+    plt.ylabel("Dist2Goal/m")
+    plt.title("Distance to next waypoint",fontdict={'size':20})
+    plt.show()
+        
+        
 def main():
     distdatalist,distlabels = load_data(distdatafile)
     pose2ddatalist,pose2dlabels = load_xyz_data(pose2ddatafile)
     veldatalist,vellabels = load_xyz_data(veldatafile)
     segtimedatalist,segtimelabels = load_segtime_data(segtimedatafile)
+    waypointsdatalist = load_waypoints_data(waypointspath)
 
     distdatalist = dataTimeProcess(distdatalist)
     distdatalist,maxdistdatacounts = dataFill(distdatalist)
@@ -278,10 +359,11 @@ def main():
     veldatalist,maxveldatacounts = dataFill(veldatalist)
 
     dist2ObsDrawLine(distdatalist,distlabels,maxdistdatacounts)
-    poseDrawLine(pose2ddatalist,pose2dlabels,maxpose2ddatacounts)
-    velDrawLine(veldatalist,vellabels,maxveldatacounts)
+    poseDrawLine(pose2ddatalist,maxpose2ddatacounts)
+    velDrawLine(veldatalist,maxveldatacounts)
     segTimeDrawLine(segtimedatalist,segtimelabels,5)
     totlalDistDraw(pose2ddatalist,pose2dlabels,5)
+    distanceToGoalDrawLine(waypointsdatalist,pose2ddatalist,pose2dlabels,maxpose2ddatacounts)
 
 
 if __name__ == '__main__':

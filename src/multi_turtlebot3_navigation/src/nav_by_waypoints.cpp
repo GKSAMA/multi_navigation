@@ -53,9 +53,10 @@ int main(int argc, char** argv){
     ros::Publisher tb0_pub = nh.advertise<geometry_msgs::Twist>("/tb3_0/cmd_vel", 1);
     ros::Publisher tb1_pub = nh.advertise<geometry_msgs::Twist>("/tb3_1/cmd_vel", 1);
     ros::Publisher tb2_pub = nh.advertise<geometry_msgs::Twist>("/tb3_2/cmd_vel", 1);
+    ros::Publisher tb3_pub = nh.advertise<geometry_msgs::Twist>("/tb3_3/cmd_vel", 1);
     // ros::Publisher runstate_pub = nh.advertise<multi_turtlebot3_navigation::RunState>("runstate",1);
     tf::TransformListener listener;
-    tf::StampedTransform transform0, transform1, transform2;
+    tf::StampedTransform transform0, transform1, transform2, transform3;
     ros::Duration(1.0).sleep();
     void *shared_memory = (void*)0;
     struct MultiNavUtil::runstate *rs;
@@ -71,12 +72,13 @@ int main(int argc, char** argv){
     rs->isStart = false;
     rs->isEnd = false;
     rs->waypoint = 0;
-    rs->idx = -1;
+    rs->idx = -2;
 
     try {
         listener.lookupTransform("/map", "tb3_0/base_footprint", ros::Time(0), transform0);
         listener.lookupTransform("/map", "tb3_1/base_footprint", ros::Time(0), transform1);
         listener.lookupTransform("/map", "tb3_2/base_footprint", ros::Time(0), transform2);
+        listener.lookupTransform("/map", "tb3_3/base_footprint", ros::Time(0), transform3);
     } catch (tf::TransformException ex) {
         ROS_ERROR("%s", ex.what());
         ros::Duration(1.0).sleep();
@@ -85,13 +87,15 @@ int main(int argc, char** argv){
     MoveBaseClient ac0("/tb3_0/move_base", true);
     MoveBaseClient ac1("/tb3_1/move_base", true);
     MoveBaseClient ac2("/tb3_2/move_base", true);
+    MoveBaseClient ac3("/tb3_3/move_base", true);
     while (!ac0.waitForServer(ros::Duration(5.0)) && !ac0.waitForServer(ros::Duration(5.0)) && !ac0.waitForServer(ros::Duration(5.0)))
         ROS_INFO("Waiting for the move_base action server to bring up");
     vector<move_base_msgs::MoveBaseGoal> goals;
-    move_base_msgs::MoveBaseGoal goal, home0, home1, home2;
+    move_base_msgs::MoveBaseGoal goal, home0, home1, home2, home3;
     MultiNavUtil::setPose(home0, transform0);
     MultiNavUtil::setPose(home1, transform1);
     MultiNavUtil::setPose(home2, transform2);
+    MultiNavUtil::setPose(home3, transform3);
     ReadGoal(goals_data);
     for (int i = 0; i < 4 * cnt; i += cnt){
         goal.target_pose.header.frame_id = "map";
@@ -105,10 +109,10 @@ int main(int argc, char** argv){
         goal.target_pose.pose.orientation.w = goals_data[i + 2];
         goals.push_back(goal);
     }
-    bool succeed0(true),succeed1(true),succeed2(true);
-    ros::Time start0(0),start1(0),start2(0),end0(0),end1(0),end2(0);
-    double time0(0.0),time1(0.0),time2(0.0);
-    multi_turtlebot3_navigation::RunState runstate;
+    bool succeed0(true),succeed1(true),succeed2(true), succeed3(true);
+    ros::Time start0(0),start1(0),start2(0),start3(0),end0(0),end1(0),end2(0),end3(0);
+    double time0(0.0),time1(0.0),time2(0.0),time3(0.0);
+    // multi_turtlebot3_navigation::RunState runstate;
     while (true){
         signal(SIGINT,DoShutdown);
         
@@ -189,11 +193,37 @@ int main(int argc, char** argv){
             cout << "Robot1 failed to reach the waypoints!" << endl;
             break;
         }
-        if(!succeed2){
+        if (succeed2){
+            MultiNavUtil::stopRobot(tb2_pub);
+            // start robot3 Navigation
+            for (int i = 0; i < 5; ++i){
+                cout << "Robot 3 Go to the " << i + 1 << " point" <<endl;
+                MultiNavUtil::setRunstate(rs, true, false, i + 1, 3);
+                if (i != 4) ac3.sendGoal(goals[i]);
+                else ac3.sendGoal(home3);
+                start3 = ros::Time::now();
+                ac3.waitForResult();
+                if (ac3.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
+                    end3 = ros::Time::now();
+                    time3 = (end3 - start3).toSec();
+                    ROS_INFO("Robot 3 use %f seconds to reach the %d point", time3, i + 1);
+                    MultiNavUtil::setRunstate(rs, false, true, i + 1, 3);
+                    saveTime(time3, i + 1, 3);
+                    ros::Duration(2.0).sleep();
+                }else{
+                    succeed3 = false;
+                    break;
+                }
+            }
+        } else{
             cout << "Robot2 failed to reach the waypoints!" << endl;
             break;
         }
-        MultiNavUtil::stopRobot(tb2_pub);
+        if(!succeed3){
+            cout << "Robot2 failed to reach the waypoints!" << endl;
+            break;
+        }
+        MultiNavUtil::stopRobot(tb3_pub);
         cout << "Mission Complete!" << endl;
         // delete shared memory
         shmdt(shared_memory);

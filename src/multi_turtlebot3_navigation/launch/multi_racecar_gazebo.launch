@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="model" default="racecar" doc="ackermann structure"/>
+  <arg name="first_racecar"  default="racecar_0"/>
+  <arg name="second_racecar" default="racecar_1"/>
+  <arg name="third_racecar" default="racecar_2"/>
+  <arg name="forth_racecar" default="racecar_3"/>
+
+  <arg name="first_racecar_x_pos" default="4.0"/>
+  <arg name="first_racecar_y_pos" default="45.0"/>
+  <arg name="first_racecar_z_pos" default="0.0"/>
+  <arg name="first_racecar_yaw"   default="3.1416"/>
+
+  <arg name="second_racecar_x_pos" default=" 4.0"/>
+  <arg name="second_racecar_y_pos" default=" 44.5"/>
+  <arg name="second_racecar_z_pos" default=" 0.0"/>
+  <arg name="second_racecar_yaw"   default=" 3.1416"/>
+
+  <arg name="third_racecar_x_pos" default=" 4.0"/>
+  <arg name="third_racecar_y_pos" default=" 44.0"/>
+  <arg name="third_racecar_z_pos" default=" 0.0"/>
+  <arg name="third_racecar_yaw"   default=" 3.1416"/>
+
+  <arg name="forth_racecar_x_pos" default=" 4.0"/>
+  <arg name="forth_racecar_y_pos" default=" 43.5"/>
+  <arg name="forth_racecar_z_pos" default=" 0.0"/>
+  <arg name="forth_racecar_yaw"   default=" 3.1416"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <!-- <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/> -->
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/multi_turtlebot3_navigation/models/aaai94maze/94AAAIMAZE.world"/> -->
+    <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/multi_turtlebot3_navigation/models/aaai94maze/94AAAIMAZEWithDynamicObstacle.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>  
+
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find multi_turtlebot3_navigation)/models/racecar/racecar.urdf.xacro" />
+  <group ns = "$(arg first_racecar)">
+    <!-- <param name="tf_prefix" value="tf1"/> -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find multi_turtlebot3_navigation)/models/racecar/racecar.urdf.xacro" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="$(arg first_racecar)" />
+    </node>
+    
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg first_racecar) -x $(arg first_racecar_x_pos) -y $(arg first_racecar_y_pos) -z $(arg first_racecar_z_pos) -Y $(arg first_racecar_yaw) -param robot_description" />
+    
+    <rosparam file="$(find multi_turtlebot3_navigation)/config/ctrl.yaml" command="load"/>
+    <node name="controller_spawner_$(arg first_racecar)" pkg="controller_manager" type="spawner"
+        args="--namespace=/$(arg first_racecar) 
+              joint_state_controller
+              left_rear_wheel_velocity_controller
+              right_rear_wheel_velocity_controller
+              left_front_wheel_velocity_controller
+              right_front_wheel_velocity_controller
+              left_steering_hinge_position_controller
+              right_steering_hinge_position_controller"/>
+      <node name="gazebo_odometry_$(arg first_racecar)" pkg="multi_turtlebot3_navigation" type="gazebo_odometry.py" args="--namespace=/$(arg first_racecar)"/>
+  </group>
+
+  <group ns = "$(arg second_racecar)"> 
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find multi_turtlebot3_navigation)/models/racecar/racecar.urdf.xacro" />
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="$(arg second_racecar)" />
+    </node>
+
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg second_racecar) -x $(arg second_racecar_x_pos) -y $(arg second_racecar_y_pos) -z $(arg second_racecar_z_pos) -Y $(arg second_racecar_yaw) -param robot_description" />
+    <rosparam file="$(find multi_turtlebot3_navigation)/config/ctrl.yaml" command="load"/>
+    <node name="controller_spawner_$(arg second_racecar)" pkg="controller_manager" type="spawner"
+        args="--namespace=/$(arg second_racecar) 
+              joint_state_controller
+              left_rear_wheel_velocity_controller
+              right_rear_wheel_velocity_controller
+              left_front_wheel_velocity_controller
+              right_front_wheel_velocity_controller
+              left_steering_hinge_position_controller
+              right_steering_hinge_position_controller"/>
+      <node name="gazebo_odometry_$(arg second_racecar)" pkg="multi_turtlebot3_navigation" type="gazebo_odometry.py" args="--namespace=/$(arg second_racecar)"/>
+  </group>
+
+  <group ns = "$(arg third_racecar)">
+      <param name="robot_description" command="$(find xacro)/xacro --inorder $(find multi_turtlebot3_navigation)/models/racecar/racecar.urdf.xacro" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="$(arg third_racecar)" />
+    </node>
+
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg third_racecar) -x $(arg third_racecar_x_pos) -y $(arg third_racecar_y_pos) -z $(arg third_racecar_z_pos) -Y $(arg third_racecar_yaw) -param robot_description" />
+    <rosparam file="$(find multi_turtlebot3_navigation)/config/ctrl.yaml" command="load"/>
+    <node name="controller_spawner_$(arg third_racecar)" pkg="controller_manager" type="spawner"
+        args="--namespace=/$(arg third_racecar) 
+              joint_state_controller
+              left_rear_wheel_velocity_controller
+              right_rear_wheel_velocity_controller
+              left_front_wheel_velocity_controller
+              right_front_wheel_velocity_controller
+              left_steering_hinge_position_controller
+              right_steering_hinge_position_controller"/>
+          <node name="gazebo_odometry_$(arg third_racecar)" pkg="multi_turtlebot3_navigation" type="gazebo_odometry.py" args="--namespace=/$(arg third_racecar)"/>
+  </group>
+
+  <group ns = "$(arg forth_racecar)">
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find multi_turtlebot3_navigation)/models/racecar/racecar.urdf.xacro" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="$(arg forth_racecar)" />
+    </node>
+
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg forth_racecar) -x $(arg forth_racecar_x_pos) -y $(arg forth_racecar_y_pos) -z $(arg forth_racecar_z_pos) -Y $(arg forth_racecar_yaw) -param robot_description" />
+    <!-- <node name="controller_spawner_$(arg forth_racecar)" pkg="controller_manager" type="spawner" ns="/$(arg forth_racecar)" respawn="false" output="screen"/> -->
+    <rosparam file="$(find multi_turtlebot3_navigation)/config/ctrl.yaml" command="load"/>
+    <node name="controller_spawner_$(arg forth_racecar)" pkg="controller_manager" type="spawner"
+        args="--namespace=/$(arg forth_racecar) 
+              joint_state_controller
+              left_rear_wheel_velocity_controller
+              right_rear_wheel_velocity_controller
+              left_front_wheel_velocity_controller
+              right_front_wheel_velocity_controller
+              left_steering_hinge_position_controller
+              right_steering_hinge_position_controller"/>
+    <node name="gazebo_odometry_$(arg forth_racecar)" pkg="multi_turtlebot3_navigation" type="gazebo_odometry.py" args="--namespace=/$(arg forth_racecar)"/>
+  </group>
+
+  <!-- <include file="$(find multi_turtlebot3_navigation)launch/robot_obstacle.launch"/> -->
+
+</launch>

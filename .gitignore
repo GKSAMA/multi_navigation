@@ -7,3 +7,5 @@ src/multi_turtlebot3_navigation/cmake-build-debug
 src/adwa_local_planner/cmake-build-debug
 src/eb_local_planner/cmake-build-debug
 src/pedsim_ros
+src/racecar_sim
+src/robot_navigation

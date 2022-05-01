@@ -17,6 +17,7 @@ int main(int argc,char **argv){
     ros::Publisher tb0_marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker0", 10);
     ros::Publisher tb1_marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker1", 10);
     ros::Publisher tb2_marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker2", 10);
+    ros::Publisher tb3_marker_pub = n.advertise<visualization_msgs::Marker>("visualization_marker3", 10);
     ros::Rate r(10);
     tf::TransformListener listener;
     void *shared_memory = (void*)0;
@@ -78,33 +79,54 @@ int main(int argc,char **argv){
     line_strip2.scale.x = 0.05;
     line_strip2.color.r = 1.0;
     line_strip2.color.a = 1.0;
+// robot3
+    visualization_msgs::Marker points3, line_strip3;
+    ros::Time start3, end3;
+    points3.header.frame_id = line_strip3.header.frame_id = "/map";
+    points3.header.stamp = line_strip3.header.stamp = ros::Time::now();
+    points3.ns = line_strip3.ns = "showpath";
+    points3.action = line_strip3.action = visualization_msgs::Marker::ADD;
+    points3.pose.orientation.w = line_strip3.pose.orientation.w = 1.0;
 
-    float x0(0), y0(0),x1(0), y1(0),x2(0), y2(0);
-    int cnt0(0),cnt1(0),cnt2(0);
-    double dist0(0.0),dist1(0.0),dist2(0.0);
-    start0 = start1 = start2 = ros::Time(0);
-    end0 = end1 = end2 = ros::Time(0);
-    double time0(0.0),time1(0.0),time2(0.0);
-    geometry_msgs::Point p0,p1,p2;
-    geometry_msgs::Pose pose0,pose1,pose2;
+    points3.id = 0;
+    line_strip3.id = 1;
+    points3.type = visualization_msgs::Marker::POINTS;
+    line_strip3.type = visualization_msgs::Marker::LINE_STRIP;
+    line_strip3.scale.x = 0.05;
+    line_strip3.color.a = 1.00;
+    line_strip3.color.r = 1.00;
+    line_strip3.color.g = 0.65;
+    line_strip3.color.b = 0.00;
+
+    float x0(0), y0(0),x1(0), y1(0),x2(0), y2(0), x3(0), y(0);
+    int cnt0(0),cnt1(0),cnt2(0), cnt3(0);
+    double dist0(0.0),dist1(0.0),dist2(0.0),dist3(0.0);
+    start0 = start1 = start2 = start3 = ros::Time(0);
+    end0 = end1 = end2 = end3 = ros::Time(0);
+    double time0(0.0),time1(0.0),time2(0.0), time3(0);
+    geometry_msgs::Point p0,p1,p2,p3;
+    geometry_msgs::Pose pose0,pose1,pose2,pose3;
     float pos_stop_threshold = 0.0001,th_stop_threshold = 0.001;
 
-    tf::StampedTransform transform0, transform1, transform2;
+    tf::StampedTransform transform0, transform1, transform2, transform3;
     ros::Duration(1.0).sleep();
     try {
         listener.lookupTransform("/map", "tb3_0/base_footprint", ros::Time(0), transform0);
         listener.lookupTransform("/map", "tb3_1/base_footprint", ros::Time(0), transform1);
         listener.lookupTransform("/map", "tb3_2/base_footprint", ros::Time(0), transform2);
+        listener.lookupTransform("/map", "tb3_3/base_footprint", ros::Time(0), transform3);
     } catch (tf::TransformException ex) {
         ROS_ERROR("%s", ex.what());
         ros::Duration(1.0).sleep();
     }
     MultiNavUtil::setPoint(p0,transform0);
     MultiNavUtil::setPoint(p1,transform1);
-    MultiNavUtil::setPoint(p2,transform2);
+    MultiNavUtil::setPoint(p2,transform2); 
+    MultiNavUtil::setPoint(p3,transform3); 
     MultiNavUtil::setPose(pose0,transform0);
     MultiNavUtil::setPose(pose1,transform1);
     MultiNavUtil::setPose(pose2,transform2);
+    MultiNavUtil::setPose(pose3,transform3);
 
     while (ros::ok()){
         tf::StampedTransform transform0, transform1, transform2;
@@ -112,6 +134,7 @@ int main(int argc,char **argv){
             listener.lookupTransform("/map", "tb3_0/base_footprint", ros::Time(0), transform0);
             listener.lookupTransform("/map", "tb3_1/base_footprint", ros::Time(0), transform1);
             listener.lookupTransform("/map", "tb3_2/base_footprint", ros::Time(0), transform2);
+            listener.lookupTransform("/map", "tb3_3/base_footprint", ros::Time(0), transform3);
         } catch (tf::TransformException ex) {
             ROS_ERROR("%s", ex.what());
             ros::Duration(1.0).sleep();
@@ -136,7 +159,7 @@ int main(int argc,char **argv){
         MultiNavUtil::setPose(pose1,transform1);
         MultiNavUtil::setPoint(p1,transform1);
         if(cnt1 > 1){line_strip1.points.push_back(p1);}
-        else cnt1++;
+        else ++cnt1;
         tb1_marker_pub.publish(line_strip1);
 
 //        MultiNavUtil::calcTotalTime(transform2,pose2,time2,start2,end2,pos_stop_threshold,th_stop_threshold,2);
@@ -146,8 +169,16 @@ int main(int argc,char **argv){
         MultiNavUtil::setPose(pose2,transform2);
         MultiNavUtil::setPoint(p2,transform2);
         if(cnt2 > 1){line_strip2.points.push_back(p2);}
-        else cnt2++;
+        else ++cnt2;
         tb2_marker_pub.publish(line_strip2);
+
+        MultiNavUtil::calcTotalTime(transform3,pose3,time3,start3,end3,rs,3);
+        MultiNavUtil::calcTotalDistance(transform3,pose3,dist3,rs,3);
+        MultiNavUtil::setPose(pose3,transform3);
+        MultiNavUtil::setPoint(p3,transform3);
+        if(cnt3 > 1){ line_strip3.points.push_back(p3);}
+        else ++cnt3;
+        tb3_marker_pub.publish(line_strip3);
         r.sleep();
     }
 

@@ -16,11 +16,16 @@
   <arg name="tb3_2_init_y" default="44.0"/>
   <arg name="tb3_2_init_a" default="3.1416"/>
 
+  <arg name="tb3_3_init_x" default="4.0"/>
+  <arg name="tb3_3_init_y" default="43.5"/>
+  <arg name="tb3_3_init_a" default="3.1416"/>
+
   <arg name="joy_config" default="f310" />
   <arg name="joy_config_file" default="$(find multi_turtlebot3_navigation)/config/$(arg joy_config).config.yaml" />
   <arg name="tb3_0_joy_dev" default="/dev/input/js0" />
   <arg name="tb3_1_joy_dev" default="/dev/input/js1" />
   <arg name="tb3_2_joy_dev" default="/dev/input/js2" />
+  <arg name="tb3_3_joy_dev" default="/dev/input/js3" />
   
   <!-- Default value for location of map config file -->
   <!-- <arg name="map_file" default="$(env HOME)/map.yaml"/> -->
@@ -169,6 +174,43 @@
     <!-- Teleop Nodes -->
     <!-- <node pkg="joy" type="joy_node" name="joy_node">
       <param name="dev" value="$(arg tb3_2_joy_dev)" />
+      <param name="deadzone" value="0.1" />
+      <param name="autorepeat_rate" value="10" />
+    </node>
+    
+    <node pkg="teleop_twist_joy" name="teleop_twist_joy" type="teleop_node">
+      <rosparam command="load" file="$(arg joy_config_file)" />
+    </node> -->
+  
+  </group>
+
+<group ns="tb3_3">
+
+    <!-- Robot State Publisher -->
+    <!-- <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="tb3_3"/>
+    </node> -->
+    
+    <!-- AMCL -->
+    <node pkg="amcl" type="amcl" name="amcl">
+      <!-- Load default parameters for turtlebot -->
+      <rosparam file="$(find multi_turtlebot3_navigation)/param/amcl_params.yaml" command="load" />
+      <param name="initial_pose_x" value="$(arg tb3_3_init_x)"/>
+      <param name="initial_pose_y" value="$(arg tb3_3_init_y)"/>
+      <param name="initial_pose_a" value="$(arg tb3_3_init_a)"/>
+
+      <param name="odom_frame_id"  value="tb3_3/odom"/>
+      <param name="base_frame_id"  value="tb3_3/base_footprint"/>
+
+      <!-- Use the single map server -->
+      <remap from="static_map" to="/static_map"/>
+
+    </node>
+
+    <!-- Teleop Nodes -->
+    <!-- <node pkg="joy" type="joy_node" name="joy_node">
+      <param name="dev" value="$(arg tb3_3_joy_dev)" />
       <param name="deadzone" value="0.1" />
       <param name="autorepeat_rate" value="10" />
     </node>

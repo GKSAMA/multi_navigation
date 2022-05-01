@@ -1,0 +1,228 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Bringup two turtlebot3s - laptop/remotepc portion -->
+
+  <!-- Command Line Arguments -->
+  <arg name="racecar_0_init_x" default="4.0"/>
+  <arg name="racecar_0_init_y" default="45.0"/>
+  <arg name="racecar_0_init_a" default="3.1416"/>
+
+  <arg name="racecar_1_init_x" default="4.0"/>
+  <arg name="racecar_1_init_y" default="44.5"/>
+  <arg name="racecar_1_init_a" default="3.1416"/>
+
+  <arg name="racecar_2_init_x" default="4.0"/>
+  <arg name="racecar_2_init_y" default="44.0"/>
+  <arg name="racecar_2_init_a" default="3.1416"/>
+
+  <arg name="racecar_3_init_x" default="4.0"/>
+  <arg name="racecar_3_init_y" default="43.5"/>
+  <arg name="racecar_3_init_a" default="3.1416"/>
+
+  <arg name="joy_config" default="f310" />
+  <arg name="joy_config_file" default="$(find multi_turtlebot3_navigation)/config/$(arg joy_config).config.yaml" />
+  <arg name="racecar_0_joy_dev" default="/dev/input/js0" />
+  <arg name="racecar_1_joy_dev" default="/dev/input/js1" />
+  <arg name="racecar_2_joy_dev" default="/dev/input/js2" />
+  <arg name="racecar_3_joy_dev" default="/dev/input/js3" />
+  
+  <!-- Default value for location of map config file -->
+  <!-- <arg name="map_file" default="$(env HOME)/map.yaml"/> -->
+  <arg name="map_file" default="/home/gk/Documents/multi_turtlebot3_navigation/src/multi_turtlebot3_navigation/models/aaai94maze/maze1.yaml"/>
+  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find racecar_description)/urdf/racecar.urdf.xacro'" />
+
+  <!-- Loads robot_description to parameter server from URDF file-->
+  <param name="robot_description" command="$(arg urdf_file)" />
+
+  <!-- Map Server -->
+  <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+
+  <!-- PedsimROS -->
+  <!-- <arg name="kbd_teleop" default="false"/>
+  <arg name="rqt_teleop" default="true"/>
+  <arg name="visualize" default="true"/>
+  <arg name="with_robot" default="true"/> -->
+
+  <!-- <arg name="simulation_factor" default="3.0"/>
+  <arg name="update_rate" default="25.0"/> -->
+
+  <!-- PedsimROS Simulator -->
+  <!-- <include file="$(find pedsim_simulator)/launch/simulator.launch">
+    <arg name="kbd_teleop" value="$(arg kbd_teleop)"/>
+    <arg name="rqt_teleop" value="$(arg rqt_teleop)"/>
+    <arg name="scene_file" value="$(find multi_turtlebot3_navigation)scenarios/ped_motion.xml"/> -->
+    <!-- <arg name="scene_file" value="$(find pedsim_simulator)scenarios/social_contexts.xml"/> -->
+    <!-- <arg name="with_robot" value="$(arg with_robot)"/>
+    <arg name="simulation_factor" value="$(arg simulation_factor)"/>
+    <arg name="update_rate" value="$(arg update_rate)"/>
+    <arg name="default_queue_size" value="10"/>
+    <arg name="max_robot_speed" value="0.1"/>
+    <arg name="robot_mode" value="1"/>
+    <arg name="enable_groups" value="true"/>
+    <arg name="pose_initial_x" value="0.0"/>
+    <arg name="pose_initial_y" value="0.0"/>
+    <arg name="pose_initial_theta" value="0.0"/>
+  </include> -->
+
+
+  <!-- PedsimROS Visualizer -->
+  <!-- <include file="$(find pedsim_visualizer)/launch/visualizer.launch"/> -->
+
+  <!-- First Robot -->
+  <group ns="racecar_0">
+
+    <!-- Robot State Publisher -->
+    <!-- <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="tb3_0"/>
+    </node> -->
+    
+    <!-- AMCL -->
+    <node pkg="amcl" type="amcl" name="amcl">
+      <!-- Load default parameters for turtlebot -->
+      <rosparam file="$(find multi_turtlebot3_navigation)/param/amcl_params.yaml" command="load" />
+      <param name="initial_pose_x" value="$(arg racecar_0_init_x)"/>
+      <param name="initial_pose_y" value="$(arg racecar_0_init_y)"/>
+      <param name="initial_pose_a" value="$(arg racecar_0_init_a)"/>
+
+      <param name="odom_frame_id"  value="racecar_0/odom"/>
+      <param name="base_frame_id"  value="racecar_0/base_footprint"/>
+
+      <!-- Use the single map server -->
+      <remap from="static_map" to="/static_map"/>
+    </node>
+
+    <!-- Teleop Nodes -->
+    <!-- <node pkg="joy" type="joy_node" name="joy_node">
+      <param name="dev" value="$(arg tb3_0_joy_dev)" />
+      <param name="deadzone" value="0.1" />
+      <param name="autorepeat_rate" value="10" />
+    </node>
+    
+    <node pkg="teleop_twist_joy" name="teleop_twist_joy" type="teleop_node">
+      <rosparam command="load" file="$(arg joy_config_file)" />
+    </node> -->
+  </group>
+
+  <!-- Second Robot -->
+  <group ns="racecar_1">
+
+    <!-- Robot State Publisher -->
+    <!-- <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="tb3_1"/>
+    </node> -->
+    
+    <!-- AMCL -->
+    <node pkg="amcl" type="amcl" name="amcl">
+      <!-- Load default parameters for turtlebot -->
+      <rosparam file="$(find multi_turtlebot3_navigation)/param/amcl_params.yaml" command="load" />
+      <param name="initial_pose_x" value="$(arg racecar_1_init_x)"/>
+      <param name="initial_pose_y" value="$(arg racecar_1_init_y)"/>
+      <param name="initial_pose_a" value="$(arg racecar_1_init_a)"/>
+
+      <param name="odom_frame_id"  value="racecar_1/odom"/>
+      <param name="base_frame_id"  value="racecar_1/base_footprint"/>
+
+      <!-- Use the single map server -->
+      <remap from="static_map" to="/static_map"/>
+
+    </node>
+    <!-- <node name="fake_localization" pkg="fake_localization" type="fake_localization" respawn="false" >
+    <param name="global_frame_id" value="map" />
+    </node> -->
+
+    <!-- Teleop Nodes -->
+    <!-- <node pkg="joy" type="joy_node" name="joy_node">
+      <param name="dev" value="$(arg tb3_1_joy_dev)" />
+      <param name="deadzone" value="0.1" />
+      <param name="autorepeat_rate" value="10" />
+    </node>
+    
+    <node pkg="teleop_twist_joy" name="teleop_twist_joy" type="teleop_node">
+      <rosparam command="load" file="$(arg joy_config_file)" />
+    </node> -->
+  
+  </group>
+
+  <group ns="racecar_2">
+
+    <!-- Robot State Publisher -->
+    <!-- <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="tb3_2"/>
+    </node> -->
+    
+    <!-- AMCL -->
+    <node pkg="amcl" type="amcl" name="amcl">
+      <!-- Load default parameters for turtlebot -->
+      <rosparam file="$(find multi_turtlebot3_navigation)/param/amcl_params.yaml" command="load" />
+      <param name="initial_pose_x" value="$(arg racecar_2_init_x)"/>
+      <param name="initial_pose_y" value="$(arg racecar_2_init_y)"/>
+      <param name="initial_pose_a" value="$(arg racecar_2_init_a)"/>
+
+      <param name="odom_frame_id"  value="racecar_2/odom"/>
+      <param name="base_frame_id"  value="racecar_2/base_footprint"/>
+
+      <!-- Use the single map server -->
+      <remap from="static_map" to="/static_map"/>
+
+    </node>
+
+    <!-- Teleop Nodes -->
+    <!-- <node pkg="joy" type="joy_node" name="joy_node">
+      <param name="dev" value="$(arg tb3_2_joy_dev)" />
+      <param name="deadzone" value="0.1" />
+      <param name="autorepeat_rate" value="10" />
+    </node>
+    
+    <node pkg="teleop_twist_joy" name="teleop_twist_joy" type="teleop_node">
+      <rosparam command="load" file="$(arg joy_config_file)" />
+    </node> -->
+  
+  </group>
+
+<group ns="racecar_3">
+
+    <!-- Robot State Publisher -->
+    <!-- <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="tb3_3"/>
+    </node> -->
+    
+    <!-- AMCL -->
+    <node pkg="amcl" type="amcl" name="amcl">
+      <!-- Load default parameters for turtlebot -->
+      <rosparam file="$(find multi_turtlebot3_navigation)/param/amcl_params.yaml" command="load" />
+      <param name="initial_pose_x" value="$(arg racecar_3_init_x)"/>
+      <param name="initial_pose_y" value="$(arg racecar_3_init_y)"/>
+      <param name="initial_pose_a" value="$(arg racecar_3_init_a)"/>
+
+      <param name="odom_frame_id"  value="racecar_3/odom"/>
+      <param name="base_frame_id"  value="racecar_3/base_footprint"/>
+
+      <!-- Use the single map server -->
+      <remap from="static_map" to="/static_map"/>
+
+    </node>
+
+    <!-- Teleop Nodes -->
+    <!-- <node pkg="joy" type="joy_node" name="joy_node">
+      <param name="dev" value="$(arg tb3_3_joy_dev)" />
+      <param name="deadzone" value="0.1" />
+      <param name="autorepeat_rate" value="10" />
+    </node>
+    
+    <node pkg="teleop_twist_joy" name="teleop_twist_joy" type="teleop_node">
+      <rosparam command="load" file="$(arg joy_config_file)" />
+    </node> -->
+  
+  </group>
+
+  <!-- RVIZ configured for tb3_0/1 -->
+  <node pkg="rviz" type="rviz" name="rviz" required="true"
+         args="-d $(find multi_turtlebot3_navigation)/rviz/racecars_one_map_threegoals.rviz"/>
+  
+</launch>

@@ -151,7 +151,7 @@ include_directories(
 add_executable(multi_showpath src/showpath.cpp)
 add_executable(save_waypoints src/save_waypoints.cpp)
 add_executable(nav_by_waypoints src/nav_by_waypoints.cpp)
-add_executable(robot_obstacle src/robot_obstacle.cpp)
+# add_executable(robot_obstacle src/robot_obstacle.cpp)
 add_executable(datarecord src/datarecord.cpp)
 # add_executable(publish_tf_node src/mp2odomtf.cpp)
 ## Rename C++ executable without prefix
@@ -162,7 +162,12 @@ add_executable(datarecord src/datarecord.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(multi_nav_utils ${${PROJECT_NAME}_EXPORTED_TARGETS})
+add_dependencies(nav_by_waypoints ${${PROJECT_NAME}_EXPORTED_TARGETS})
+add_dependencies(multi_showpath ${${PROJECT_NAME}_EXPORTED_TARGETS})
+add_dependencies(datarecord ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
@@ -172,7 +177,7 @@ add_executable(datarecord src/datarecord.cpp)
 target_link_libraries(multi_showpath ${catkin_LIBRARIES} multi_nav_utils)
 target_link_libraries(save_waypoints ${catkin_LIBRARIES})
 target_link_libraries(nav_by_waypoints ${catkin_LIBRARIES} multi_nav_utils)
-target_link_libraries(robot_obstacle ${catkin_LIBRARIES})
+# target_link_libraries(robot_obstacle ${catkin_LIBRARIES})
 target_link_libraries(datarecord ${catkin_LIBRARIES} multi_nav_utils)
 # target_link_libraries(publish_tf_node ${catkin_LIBRARIES})
 #############
