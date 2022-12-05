@@ -19,6 +19,7 @@ find_package(catkin REQUIRED
   std_msgs
   message_generation
  )
+ find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -179,7 +180,7 @@ target_link_libraries(multi_showpath ${catkin_LIBRARIES} multi_nav_utils)
 target_link_libraries(save_waypoints ${catkin_LIBRARIES})
 target_link_libraries(nav_by_waypoints ${catkin_LIBRARIES} multi_nav_utils)
 # target_link_libraries(robot_obstacle ${catkin_LIBRARIES})
-target_link_libraries(datarecord ${catkin_LIBRARIES} multi_nav_utils)
+target_link_libraries(datarecord ${catkin_LIBRARIES} multi_nav_utils Eigen3::Eigen)
 # target_link_libraries(publish_tf_node ${catkin_LIBRARIES})
 #############
 ## Install ##
