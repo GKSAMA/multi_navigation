@@ -29,7 +29,7 @@
   
   <!-- Default value for location of map config file -->
   <!-- <arg name="map_file" default="$(env HOME)/map.yaml"/> -->
-  <arg name="map_file" default="/home/gk/Documents/multi_turtlebot3_navigation/src/multi_turtlebot3_navigation/models/aaai94maze/maze1.yaml"/>
+  <arg name="map_file" default="$(find multi_turtlebot3_navigation)/models/aaai94maze/maze1.yaml"/>
   <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
   <arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro'" />
 

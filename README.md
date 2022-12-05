@@ -1,9 +1,25 @@
 # multi_turtlebot3_navigation
 
+## Environment
+
+This project has built successfully in Ubuntu18.04 and Ubuntu20.04.
+
+Please install ROS first. Follow this [page](wiki.ros.org/melodic/Installation) to install ROS.
+
+## dependencies
+
+* sudo apt install ros-${ros_version}-base-local-planner
+* sudo apt install ros-${ros_version}-move-base
+
 ## build
 
-catkin_make  
-source devel/setup.bash  
+git clone https://github.com/GKSAMA/multi_navigation.git
+
+cd ..
+
+catkin_make
+
+source devel/setup.bash
 
 ## Prepare
 
@@ -14,12 +30,23 @@ source devel/setup.bash
 ## 运行(turtlebot)：
 
 roslaunch multi_turtlebot3_navigation multi_turtlebot3_gazebo.launch
+
 roslaunch multi_turtlebot3_navigation move_base_tree.launch
+
 roslaunch multi_turtlebot3_navigation navigation_tree.launch
+
+
+
 (optional)
+
 rosrun multi_turtlebot3_navigation multi_showpath
+
 rosrun multi_turtlebot3_navigation navigation_by_waypoints
+
 (data record)
+
 rosrun multi_turtlebot3_navigation datarecord
-(standard show)  
+
+(data analysis)
+
 rosrun multi_turtlebot3_navigation showdata
