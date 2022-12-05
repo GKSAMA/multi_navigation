@@ -29,7 +29,7 @@
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <!-- <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/> -->
     <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/multi_turtlebot3_navigation/models/aaai94maze/94AAAIMAZE.world"/> -->
-    <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/multi_turtlebot3_navigation/models/aaai94maze/94AAAIMAZEWithDynamicObstacle.world"/>
+    <arg name="world_name" value="$(find multi_turtlebot3_navigation)/models/aaai94maze/94AAAIMAZEWithDynamicObstacle.world"/>
     <arg name="paused" value="false"/>
     <arg name="use_sim_time" value="true"/>
     <arg name="gui" value="true"/>
