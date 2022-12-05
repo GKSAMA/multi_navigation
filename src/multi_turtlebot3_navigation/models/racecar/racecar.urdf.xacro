@@ -38,8 +38,8 @@ limitations under the License.
 
 <robot name="racecar" xmlns:xacro="http://www.ros.org/wiki/xacro">
   <!-- include sensors -->
-  <xacro:include filename="$(find racecar_description)/urdf/sensors/lidar.xacro" />
-  <xacro:include filename="$(find racecar_description)/urdf/sensors/imu.xacro" />
+  <xacro:include filename="$(find multi_turtlebot3_navigation)/models/racecar/sensors/lidar.xacro" />
+  <xacro:include filename="$(find multi_turtlebot3_navigation)/models/racecar/sensors/imu.xacro" />
   <!-- <xacro:include filename="$(find racecar_description)/urdf/sensors/camera.xacro" /> -->
 
   <!-- Degree-to-radian conversions -->

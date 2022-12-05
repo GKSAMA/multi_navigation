@@ -2,7 +2,7 @@
 <launch>
   <!-- Launch file for move_base to run for one of multiple turtlebot3's -->
   
-  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="model" default="racecar"/>
   <!-- Namespace and tf_prefix are assumed to be the same -->
   <arg name="robot_namespace"/>
   <arg name="move_forward_only" default="false"/>
@@ -16,6 +16,7 @@
       <rosparam file="$(find multi_turtlebot3_navigation)/param/local_costmap_params.yaml" command="load" />
       <rosparam file="$(find multi_turtlebot3_navigation)/param/global_costmap_params.yaml" command="load" />
       <rosparam file="$(find multi_turtlebot3_navigation)/param/move_base_params.yaml" command="load" />
+      <!-- <rosparam file="$(find multi_turtlebot3_navigation)/param/global_planner_params.yaml" command="load" /> -->
       <rosparam file="$(find multi_turtlebot3_navigation)/param/teb/teb_local_planner_params_$(arg model).yaml" command="load" />
 
       <!-- Set tf_prefix for frames explicity, overwriting defaults -->
@@ -44,6 +45,8 @@
       <remap from="map" to="/map"/>
       <param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" />
     </node>
+    <node name="$(arg robot_namespace)_nav_sim" pkg="multi_turtlebot3_navigation" type="nav_sim.py" args="--namespace=/$(arg robot_namespace)" output="screen"/>
+    <node name="$(arg robot_namespace)_servo_commands" pkg="multi_turtlebot3_navigation" type="servo_commands.py" args="--namespace=/$(arg robot_namespace)" />
   </group>
   
 </launch>

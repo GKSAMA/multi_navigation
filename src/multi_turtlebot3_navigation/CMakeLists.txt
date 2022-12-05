@@ -110,7 +110,7 @@ find_package(catkin REQUIRED
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+ INCLUDE_DIRS include
 #  LIBRARIES teleop_nps
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
@@ -135,6 +135,8 @@ include_directories(
 
 ## Declare a C++ library
  add_library(multi_nav_utils
+
+   include/multi_turtlebot3_navigation/utils.h
    src/utils.cpp
  )
 
@@ -172,7 +174,7 @@ add_dependencies(datarecord ${${PROJECT_NAME}_EXPORTED_TARGETS})
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-
+target_link_libraries(multi_nav_utils ${catkin_LIBRARIES})
 target_link_libraries(multi_showpath ${catkin_LIBRARIES} multi_nav_utils)
 target_link_libraries(save_waypoints ${catkin_LIBRARIES})
 target_link_libraries(nav_by_waypoints ${catkin_LIBRARIES} multi_nav_utils)

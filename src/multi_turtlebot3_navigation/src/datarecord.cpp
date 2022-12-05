@@ -15,12 +15,14 @@
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/Pose2D.h"
 #include "nav_msgs/Odometry.h"
+#include "nav_msgs/Path.h"
 #include "laser_geometry/laser_geometry.h"
 
 #include "multi_turtlebot3_navigation/utils.h"
-#define Dist2ObsPath "/home/gk/Documents/DataRecord/dist.data"
+#define Dist2ObsPath "/home/gk/Documents/DataRecord/minobsdist.data"
 #define pose2Ddatapath "/home/gk/Documents/DataRecord/pose2Ddata.data"
 #define veldatapath "/home/gk/Documents/DataRecord/veldata.data"
+#define dist2goal "/home/gk/Documents/DataRecord/dist2goal.data"
 
 void scanCB(const sensor_msgs::LaserScan::ConstPtr& scan, MultiNavUtil::runstate *rs,int idx){
     if(rs->isStart && rs->idx == idx){
@@ -73,6 +75,21 @@ void odomCB(const nav_msgs::Odometry::ConstPtr& odometry, MultiNavUtil::runstate
     }
 }
 
+void pathCB(const nav_msgs::Path::ConstPtr& path, MultiNavUtil::runstate *rs,int idx){
+    if(rs->isStart && rs->idx == idx){
+        double time = path->header.stamp.toSec();
+        double sumdist = 0;
+        for(int i = 1; i < path->poses.size(); ++i){
+            sumdist += sqrt(pow((path->poses[i].pose.position.x - path->poses[i - 1].pose.position.x), 2) + 
+                            pow((path->poses[i].pose.position.y - path->poses[i-1].pose.position.y), 2));
+        }
+        std::ofstream ofglobaldist;
+        ofglobaldist.open(dist2goal,std::ios::out|std::ios::app);
+        ofglobaldist << time << " " << sumdist << " " << rs->waypoint << " " << idx << std::endl;
+        ofglobaldist.close();
+    }
+}
+
 int main(int argc, char** argv){
     ros::init(argc, argv,"check_distance");
     ros::NodeHandle nh;
@@ -108,5 +125,10 @@ int main(int argc, char** argv){
     ros::Subscriber odomsub1 = nh.subscribe<nav_msgs::Odometry>("/tb3_1/odom",100,boost::bind(&odomCB,_1,rs,1));
     ros::Subscriber odomsub2 = nh.subscribe<nav_msgs::Odometry>("/tb3_2/odom",100,boost::bind(&odomCB,_1,rs,2));
     ros::Subscriber odomsub3 = nh.subscribe<nav_msgs::Odometry>("/tb3_3/odom",100,boost::bind(&odomCB,_1,rs,3));
+
+    ros::Subscriber globalpathsub0 = nh.subscribe<nav_msgs::Path>("/tb3_0/move_base/GlobalPlanner/plan", 100,boost::bind(&pathCB, _1, rs, 0));
+    ros::Subscriber globalpathsub1 = nh.subscribe<nav_msgs::Path>("/tb3_1/move_base/GlobalPlanner/plan", 100,boost::bind(&pathCB, _1, rs, 1));
+    ros::Subscriber globalpathsub2 = nh.subscribe<nav_msgs::Path>("/tb3_2/move_base/GlobalPlanner/plan", 100,boost::bind(&pathCB, _1, rs, 2));
+    ros::Subscriber globalpathsub3 = nh.subscribe<nav_msgs::Path>("/tb3_3/move_base/GlobalPlanner/plan", 100,boost::bind(&pathCB, _1, rs, 3));
     ros::spin();
 }

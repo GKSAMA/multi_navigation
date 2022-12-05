@@ -47,6 +47,8 @@
       <remap from="map" to="/map"/>
       <param name="DWBLocalPlanner/min_vel_x" value="0.0" if="$(arg move_forward_only)" />
     </node>
+    <node name="$(arg robot_namespace)_nav_sim" pkg="multi_turtlebot3_navigation" type="nav_sim.py" args="--namespace=/$(arg robot_namespace)" output="screen"/>
+    <node name="$(arg robot_namespace)_servo_commands" pkg="multi_turtlebot3_navigation" type="servo_commands.py" args="--namespace=/$(arg robot_namespace)" />
   </group>
   
 </launch>

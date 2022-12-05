@@ -24,6 +24,7 @@ find_package(catkin REQUIRED
         tf2
         tf2_geometry_msgs
         tf2_ros
+        my_fuzzy_controller
         )
 
 find_package(Eigen3 REQUIRED)
@@ -35,14 +36,28 @@ include_directories(
 )
 add_definitions(${EIGEN3_DEFINITIONS})
 
+link_directories(${catkin_LIBRARIES})
+
 # dynamic reconfigure
 generate_dynamic_reconfigure_options(
-        cfg/DWAPlanner.cfg
+        cfg/ADWAPlanner.cfg
 )
+
+add_library(${PROJECT_NAME} 
+        src/ackermann_odometry_helper.cpp
+        src/adwa_trajectory_sample_generator.cpp
+        src/adwa_planner_utils.cpp
+        src/adwa_scored_sampling_planner.cpp
+        src/desired_direction_cost.cpp
+        src/vertical_distance_cost.cpp
+        src/min_turn_radius_cost.cpp
+        src/heading_cost_function.cpp
+        src/adwa_planner.cpp 
+        src/adwa_planner_ros.cpp)
 
 catkin_package(
         INCLUDE_DIRS include
-        LIBRARIES adwa_local_planner
+        LIBRARIES ${PROJECT_NAME}
         CATKIN_DEPENDS
         base_local_planner
         dynamic_reconfigure
@@ -53,11 +68,10 @@ catkin_package(
         tf2
         tf2_ros
 )
-add_executable(showpath src/showpath.cpp)
-add_library(adwa_local_planner src/adwa_planner.cpp src/adwa_planner_ros.cpp src/showpath.cpp)
-add_dependencies(adwa_local_planner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(adwa_local_planner ${catkin_LIBRARIES})
-target_link_libraries(showpath ${catkin_LIBRARIES})
+
+add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
 install(TARGETS adwa_local_planner
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
@@ -73,7 +87,11 @@ install(FILES cfg/adwa_planner_plugin.xml
 #        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
 #        PATTERN ".svn" EXCLUDE
 #        )
-install(DIRECTORY include/
+install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
         PATTERN ".svn" EXCLUDE
         )
+
+add_executable(tftest src/tftest.cpp)
+add_dependencies(tftest ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(tftest ${catkin_LIBRARIES} ${PROJECT_NAME})

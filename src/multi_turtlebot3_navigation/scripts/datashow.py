@@ -1,4 +1,3 @@
-from cProfile import label
 import os
 import math
 import pandas as pd
@@ -9,14 +8,44 @@ from copy import deepcopy
 
 waypointspath = "/home/gk/Documents/multi_turtlebot3_navigation/src/multi_turtlebot3_navigation/config/waypoints.data"
 datapath = "/home/gk/Documents/DataRecord"
-distdatafile = "dist.data"
+distdatafile = "minobsdist.data"
 pose2ddatafile = "pose2Ddata.data"
 veldatafile = "veldata.data"
 segtimedatafile = "segtime.data"
+globalpathdistfile = "dist2goal.data"
 
+
+def load_pathdist_data(datafile):
+    datas = []
+    labels = []
+    with open(os.path.join(datapath,datafile), 'r') as f:
+        for line in f.readlines():
+            line_data = line.split(' ')
+            line_data[0] = float(line_data[0])
+            line_data[1] = float(line_data[1])
+            line_data[2] = int(line_data[2])
+            line_data[3] = int(line_data[3])
+            datas.append(line_data)
+    datalist = []
+    start_time = datas[0][0]
+    datatemp = []
+    idx = 0
+    labels.append(idx)
+    for data in datas:
+        if(data[3] != idx):
+            datalist.append(deepcopy(datatemp))
+            idx = data[3]
+            labels.append(idx)
+            datatemp = []
+        data[0] = data[0] - start_time;
+        datatemp.append([data[0], data[1], data[2]])
+    datalist.append(datatemp)
+    return datalist,labels
+
+# data format : [time, x, y, theta]
 def load_waypoints_data(datafile):
     datas = []
-    with open(waypointspath, 'r') as f:
+    with open(datafile, 'r') as f:
         for line in f.readlines():
             line_data = line.split(' ')
             line_data[0] = float(line_data[0])
@@ -24,7 +53,6 @@ def load_waypoints_data(datafile):
             line_data[2] = float(line_data[2])
             line_data[3] = float(line_data[3])
             datas.append(line_data)
-    print(datas)
     return datas
 
 # data format : ["time" "data" "idx"]
@@ -54,6 +82,7 @@ def load_data(datafile):
     datalist.append(datatemp)
     return datalist,labels
 
+# data format : [time, waypoint, idx]
 def load_segtime_data(datafile):
     datas = []
     labels = []
@@ -131,6 +160,33 @@ def dataFill(datalist):
                 datalist[i].append(deepcopy(datatmp))
                 datatmp = []
     return datalist,maxdatacnt
+
+def wpPathDataFill(datalist,wpnum):
+    datas = []
+    maxcountlist = []
+    robots = len(datalist)
+    for wp in range(1,wpnum):
+        wplist = []
+        for robot in range(robots):
+            robotdatalist = []
+            for distdata in datalist[robot]:
+                if distdata[2] == wp:
+                    robotdatalist.append(distdata[1])
+                elif distdata[2] > wp:
+                    break
+            wplist.append(deepcopy(robotdatalist))
+        maxlen = 0;
+        for p in wplist:
+            maxlen = max(maxlen, len(p))
+        maxcountlist.append(maxlen)
+        # datafill
+        for robotdata in wplist:
+            curlen = len(robotdata)
+            for j in range(curlen, maxlen):
+                robotdata.append(robotdata[curlen - 1])
+        datas.append(deepcopy(wplist))
+    return datas,maxcountlist
+
 
 def dist2ObsDrawLine(datas, labels,maxdatacounts):
     x = []
@@ -343,6 +399,35 @@ def distanceToGoalDrawLine(waypointsdatas,posedatas,labels,maxdatacounts):
     plt.title("Distance to next waypoint",fontdict={'size':20})
     plt.show()
         
+
+def globalDistToGoalDrawLine(globaldistdatas,labels,maxdatacounts):
+    x = []
+    for maxdatacount in maxdatacounts:
+        x.append(list(range(maxdatacount)))
+    y = globaldistdatas
+    # distlist = []
+    # for i in range(len(globaldistdatas)):
+    #     for j in range(len(globaldistdatas[i])):
+    #         distlist.append(globaldistdatas[i][j][1])
+    #     y.append(deepcopy(distlist))
+    #     distlist = []
+    fig,axs = plt.subplots(nrows = int((len(y) + 1)/2), ncols = 2,figsize=(20,6),dpi = 70)
+    labels = ['eband','dwa','teb','dwb']
+    colors = ['blue','green','red','orange']
+    wp = 0
+    for i in range(len(axs)):
+        for j in range(len(axs[i])):
+            if(wp == len(maxdatacounts)):
+                break
+            for robot in range(len(globaldistdatas[wp])):
+                axs[i][j].plot(x[wp], y[wp][robot], c=colors[robot], label=labels[robot])
+            axs[i][j].legend(loc='best')
+            axs[i][j].set_xlabel('Time/s',fontdict={'size':16})
+            axs[i][j].set_ylabel('Distance/m',fontdict={'size':16})
+            wp += 1;
+    fig.autofmt_xdate()
+    plt.title('Distance to the goal',fontdict={'size':20})
+    plt.show()
         
 def main():
     distdatalist,distlabels = load_data(distdatafile)
@@ -350,6 +435,7 @@ def main():
     veldatalist,vellabels = load_xyz_data(veldatafile)
     segtimedatalist,segtimelabels = load_segtime_data(segtimedatafile)
     waypointsdatalist = load_waypoints_data(waypointspath)
+    globaldistdatalist,globalpathlabels = load_pathdist_data(globalpathdistfile)
 
     distdatalist = dataTimeProcess(distdatalist)
     distdatalist,maxdistdatacounts = dataFill(distdatalist)
@@ -357,13 +443,17 @@ def main():
     pose2ddatalist,maxpose2ddatacounts = dataFill(pose2ddatalist)
     veldatalist = dataTimeProcess(veldatalist)
     veldatalist,maxveldatacounts = dataFill(veldatalist)
+    globaldistdatalist = dataTimeProcess(globaldistdatalist)
+    globaldistdatalist, maxglobaldistdatacounts = wpPathDataFill(globaldistdatalist, len(waypointsdatalist))
+    # print(globaldistdatalist)
 
     dist2ObsDrawLine(distdatalist,distlabels,maxdistdatacounts)
     poseDrawLine(pose2ddatalist,maxpose2ddatacounts)
     velDrawLine(veldatalist,maxveldatacounts)
     segTimeDrawLine(segtimedatalist,segtimelabels,5)
     totlalDistDraw(pose2ddatalist,pose2dlabels,5)
-    distanceToGoalDrawLine(waypointsdatalist,pose2ddatalist,pose2dlabels,maxpose2ddatacounts)
+    # distanceToGoalDrawLine(waypointsdatalist,pose2ddatalist,pose2dlabels,maxpose2ddatacounts)
+    globalDistToGoalDrawLine(globaldistdatalist,globalpathlabels,maxglobaldistdatacounts)
 
 
 if __name__ == '__main__':

@@ -16,8 +16,8 @@
       <rosparam file="$(find multi_turtlebot3_navigation)/param/local_costmap_params.yaml" command="load" />
       <rosparam file="$(find multi_turtlebot3_navigation)/param/global_costmap_params.yaml" command="load" />
       <rosparam file="$(find multi_turtlebot3_navigation)/param/move_base_params.yaml" command="load" />
-      <!-- <rosparam file="$(find multi_turtlebot3_navigation)/param/adwa/adwa_local_planner_params_$(arg model).yaml" command="load" /> -->
-      <rosparam file="$(find multi_turtlebot3_navigation)/param/dwa/dwa_local_planner_params_$(arg model).yaml" command="load" />
+      <rosparam file="$(find multi_turtlebot3_navigation)/param/adwa/adwa_local_planner_params_$(arg model).yaml" command="load" />
+      <!-- <rosparam file="$(find multi_turtlebot3_navigation)/param/dwa/dwa_local_planner_params_$(arg model).yaml" command="load" /> -->
 
       <!-- Set tf_prefix for frames explicity, overwriting defaults -->
       <param name="global_costmap/scan/sensor_frame" 
@@ -41,8 +41,8 @@
       <param name="planner_frequency" value="1.0" />
       <param name="planner_patience" value="5.0" />
 
-      <!-- <param name="base_local_planner" value="adwa_local_planner/ADWAPlannerROS" /> -->
-      <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+      <param name="base_local_planner" value="adwa_local_planner/ADWAPlannerROS" />
+      <!-- <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" /> -->
       <param name="controller_frequency" value="5.0" />
       <param name="controller_patience" value="15.0" />
 

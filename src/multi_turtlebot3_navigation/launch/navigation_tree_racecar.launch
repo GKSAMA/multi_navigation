@@ -4,19 +4,19 @@
   <!-- Bringup two turtlebot3s - laptop/remotepc portion -->
 
   <!-- Command Line Arguments -->
-  <arg name="racecar_0_init_x" default="4.0"/>
+  <arg name="racecar_0_init_x" default="5.5"/>
   <arg name="racecar_0_init_y" default="45.0"/>
   <arg name="racecar_0_init_a" default="3.1416"/>
 
-  <arg name="racecar_1_init_x" default="4.0"/>
+  <arg name="racecar_1_init_x" default="5.5"/>
   <arg name="racecar_1_init_y" default="44.5"/>
   <arg name="racecar_1_init_a" default="3.1416"/>
 
-  <arg name="racecar_2_init_x" default="4.0"/>
+  <arg name="racecar_2_init_x" default="5.5"/>
   <arg name="racecar_2_init_y" default="44.0"/>
   <arg name="racecar_2_init_a" default="3.1416"/>
 
-  <arg name="racecar_3_init_x" default="4.0"/>
+  <arg name="racecar_3_init_x" default="5.5"/>
   <arg name="racecar_3_init_y" default="43.5"/>
   <arg name="racecar_3_init_a" default="3.1416"/>
 

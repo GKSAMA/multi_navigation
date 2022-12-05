@@ -3,6 +3,7 @@ import rospy
 from std_msgs.msg import Float64
 from geometry_msgs.msg import Twist
 import math
+import argparse
 class CmdVel2Gazebo:
     def __init__(self,namespace):
         rospy.init_node('cmdvel2gazebo', anonymous=True)  
@@ -121,10 +122,14 @@ class CmdVel2Gazebo:
             self.pub_steerL.publish(msgSteer)
             self.pub_steerR.publish(msgSteer)
 
+def parser_args(args=None): 
+    parser = argparse.ArgumentParser(description='namespace')
+    parser.add_argument('--namespace', metavar='ns', default='/racecar_0')
+    return parser.parse_args(args=args)
 
 if __name__ == '__main__':
-    namespace = rospy.get_param('namespace','/racecar')
+    args=parser_args(rospy.myargv()[1:])
     try:
-        CmdVel2Gazebo(namespace)
+        CmdVel2Gazebo(args.namespace)
     except rospy.ROSInterruptException:
         pass

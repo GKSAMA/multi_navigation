@@ -1,14 +1,17 @@
-ADWAPlannerROS:
+base_local_planner: nav_core_adapter::LocalPlannerAdapter
+LocalPlannerAdapter: 
+  planner_name: dwb_local_planner::DWBLocalPlanner
 
+DWBLocalPlanner:
 # Robot Configuration Parameters
-  max_vel_x: 0.5 # 0.22
-  min_vel_x: -0.22
+  max_vel_x: 1.0 # 0.22
+  min_vel_x: -0.44
 
   max_vel_y: 0.0
   min_vel_y: 0.0
 
 # The velocity when robot is moving in a straight line
-  max_trans_vel:  0.5 # 0.22
+  max_trans_vel:  1.0 # 0.22
   min_trans_vel:  0.11
 
   max_vel_theta: 2.75
@@ -31,7 +34,7 @@ ADWAPlannerROS:
   controller_frequency: 10.0
 
 # Trajectory Scoring Parameters
-  path_distance_bias: 32.0
+  path_distance_bias: 64.0
   goal_distance_bias: 20.0
   occdist_scale: 0.02
   forward_point_distance: 0.325
