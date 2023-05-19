@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+  <include file="$(find multi_turtlebot3_navigation)/launch/movebase/turtlebot3/move_base_namespace_dwa.launch">
+  <arg name="robot_namespace" value="tb3_0" />
+  </include>
+</launch>	

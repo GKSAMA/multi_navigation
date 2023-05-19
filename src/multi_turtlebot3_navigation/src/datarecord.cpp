@@ -19,10 +19,11 @@
 #include "laser_geometry/laser_geometry.h"
 
 #include "multi_turtlebot3_navigation/utils.h"
-#define Dist2ObsPath "/home/gk/Documents/DataRecord/minobsdist.data"
-#define pose2Ddatapath "/home/gk/Documents/DataRecord/pose2Ddata.data"
-#define veldatapath "/home/gk/Documents/DataRecord/veldata.data"
-#define dist2goal "/home/gk/Documents/DataRecord/dist2goal.data"
+#define SavePath "/home/gk/Documents/DataRecord/"
+#define Dist2ObsPath "minobsdist.data"
+#define pose2Ddatapath "pose2Ddata.data"
+#define veldatapath "veldata.data"
+#define dist2goal "dist2goal.data"
 
 void scanCB(const sensor_msgs::LaserScan::ConstPtr& scan, MultiNavUtil::runstate *rs,int idx){
     if(rs->isStart && rs->idx == idx){
@@ -34,7 +35,7 @@ void scanCB(const sensor_msgs::LaserScan::ConstPtr& scan, MultiNavUtil::runstate
                 minrange = scan->ranges[i];
         }
         std::ofstream ofs;
-        ofs.open(Dist2ObsPath,std::ios::out|std::ios::app);
+        ofs.open(std::string(SavePath)+std::string(Dist2ObsPath),std::ios::out|std::ios::app);
         ofs << time << " " << minrange << " " << rs->idx << std::endl;
         ofs.close();
     }
@@ -66,8 +67,8 @@ void odomCB(const nav_msgs::Odometry::ConstPtr& odometry, MultiNavUtil::runstate
         MultiNavUtil::PoseToPose2D(pose,pose2D);
 
         std::ofstream ofspose,ofsvel;
-        ofspose.open(pose2Ddatapath,std::ios::out|std::ios::app);
-        ofsvel.open(veldatapath,std::ios::out|std::ios::app);
+        ofspose.open(std::string(SavePath)+std::string(pose2Ddatapath),std::ios::out|std::ios::app);
+        ofsvel.open(std::string(SavePath)+std::string(veldatapath),std::ios::out|std::ios::app);
         ofspose << time << " " << pose2D.x << " " <<  pose2D.y << " " <<  pose2D.theta << " " << rs->waypoint << " " << idx << std::endl;
         ofsvel << time << " " << vel.linear.x << " " <<  vel.linear.y << " " <<  vel.angular.z << " " << rs->waypoint << " " << idx << std::endl;
         ofspose.close();
@@ -84,7 +85,7 @@ void pathCB(const nav_msgs::Path::ConstPtr& path, MultiNavUtil::runstate *rs,int
                             pow((path->poses[i].pose.position.y - path->poses[i-1].pose.position.y), 2));
         }
         std::ofstream ofglobaldist;
-        ofglobaldist.open(dist2goal,std::ios::out|std::ios::app);
+        ofglobaldist.open(std::string(SavePath)+std::string(dist2goal),std::ios::out|std::ios::app);
         ofglobaldist << time << " " << sumdist << " " << rs->waypoint << " " << idx << std::endl;
         ofglobaldist.close();
     }

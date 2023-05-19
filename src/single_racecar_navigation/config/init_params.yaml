@@ -1,0 +1,12 @@
+vertical:
+  car:
+    init_x: 4.85
+    init_y: 0.51
+    init_z: 0.0
+    init_th: 0.0
+parallel:
+  car:
+    init_x: 3.2
+    init_y: 0.40
+    init_z: 0.0
+    init_th: 0.0

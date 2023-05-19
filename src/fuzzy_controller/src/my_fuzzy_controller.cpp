@@ -147,6 +147,17 @@ double MyFuzzyController::realize(vector<double> inputData, vector<double> k)
     for(int i = 0; i < tableRow; ++i){
         // u += table[i][0] * table[i][3] + table[i][1] * table[i][3] + table[i][2] * table[i][3];
         // subU += table[i][0] + table[i][1] + table[i][2];
+        
+        // mu_R_i
+
+        //TEST
+        // int minIndex = 0;
+        // double tmp = min(table[i][1], table[i][2]);
+        // minIndex = table[i][0] < table[i][1]? 0 : 1;
+        // tmp = min(table[i][2], tmp);
+        // minIndex = table[i][2] < tmp? 2 : minIndex;
+        // std::cout<< minIndex << " ";
+        
         double tmp = min(table[i][0], min(table[i][1], table[i][2]));
         u += tmp * table[i][3];
         subU += tmp;

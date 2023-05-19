@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="model" default="racecar" doc="ackermann structure"/>
+  <arg name="first_racecar"  default="racecar_0"/>
+
+  <!-- <arg name="first_racecar_x_pos" default="5.5"/>
+  <arg name="first_racecar_y_pos" default="44.0"/>
+  <arg name="first_racecar_z_pos" default="0.1"/>
+  <arg name="first_racecar_yaw"   default="-3.14"/> -->
+
+  <!-- <arg name="first_racecar_x_pos" default="2"/>
+  <arg name="first_racecar_y_pos" default="7.5"/>
+  <arg name="first_racecar_z_pos" default="0.1"/>
+  <arg name="first_racecar_yaw"   default="0.0"/> -->
+
+  <!-- <arg name="first_racecar_x_pos" default="4.65"/> -->
+  <!-- <arg name="first_racecar_x_pos" default="6.5"/>
+  <arg name="first_racecar_y_pos" default="3.3245"/>
+  <arg name="first_racecar_z_pos" default="0.00"/>
+  <arg name="first_racecar_yaw"   default="0.0"/> -->
+
+  <!-- test -->
+  <arg name="first_racecar_x_pos" default="7.5"/>
+  <arg name="first_racecar_y_pos" default="3.3245"/>
+  <arg name="first_racecar_z_pos" default="0.00"/>
+  <arg name="first_racecar_yaw"   default="0.00"/>
+
+  <param name="pos_x" value="$(arg first_racecar_x_pos)"/>
+  <param name="pos_y" value="$(arg first_racecar_y_pos)"/>
+  <param name="pos_z" value="$(arg first_racecar_z_pos)"/>
+  <param name="pos_yaw" value="$(arg first_racecar_yaw)"/>
+  <param name="robotName" value="$(arg first_racecar)"/>
+  <param name="vel_x" value="-0.05"/>
+  <param name="vel_th" value="0.785"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <!-- <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/> -->
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/models/aaai94maze/94AAAIMAZE.world"/> -->
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/models/park/park.world"/> -->
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/models/single_parking_space/single_parking_space.world"/> -->
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/models/parallel_parking_space/parallel_parking_space.world"/> -->
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/worlds/simple_parking_space_with_house.world"/> -->
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/models/aaai94maze/94AAAIMAZEWithStaticObstacle.world"/> -->
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>  
+
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(find single_racecar_navigation)/models/racecar/racecar.urdf.xacro" />
+  <group ns = "$(arg first_racecar)">
+    <!-- <param name="tf_prefix" value="tf1"/> -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(find single_racecar_navigation)/models/racecar/racecar.urdf.xacro" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="$(arg first_racecar)" />
+    </node>
+    
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg first_racecar) -x $(arg first_racecar_x_pos) -y $(arg first_racecar_y_pos) -z $(arg first_racecar_z_pos) -Y $(arg first_racecar_yaw) -param robot_description" />
+    
+    <rosparam file="$(find single_racecar_navigation)/config/ctrl.yaml" command="load"/>
+    <node name="controller_spawner_$(arg first_racecar)" pkg="controller_manager" type="spawner"
+        args="--namespace=/$(arg first_racecar) 
+              joint_state_controller
+              left_rear_wheel_velocity_controller
+              right_rear_wheel_velocity_controller
+              left_front_wheel_velocity_controller
+              right_front_wheel_velocity_controller
+              left_steering_hinge_position_controller
+              right_steering_hinge_position_controller"/>
+    <node name="gazebo_odometry_$(arg first_racecar)" pkg="single_racecar_navigation" type="gazebo_odometry.py" 
+          args="--namespace=/$(arg first_racecar) --x=$(arg first_racecar_x_pos) --y=$(arg first_racecar_y_pos) --z=$(arg first_racecar_z_pos) --th=$(arg first_racecar_yaw)" output="screen"/>
+    <node name="$(arg first_racecar)_nav_sim" pkg="single_racecar_navigation" type="nav_sim.py" args="--namespace=/$(arg first_racecar)" output="screen"/>
+    <!-- <node name="$(arg first_racecar)_servo_commands" pkg="single_racecar_navigation" type="servo_commands.py" args="--><!--namespace=/$(arg first_racecar)" /> -->
+    <node name="$(arg first_racecar)_cmdvel2gazebo" pkg="single_racecar_navigation" type="cmdvel2gazebo.py" args="--namespace=/$(arg first_racecar)" output="screen"/>
+    <node name="$(arg first_racecar)_footprint" pkg="single_racecar_navigation" type="footprint_draw.py" args="--namespace=/$(arg first_racecar)" output="screen"/>
+  </group>
+
+</launch>

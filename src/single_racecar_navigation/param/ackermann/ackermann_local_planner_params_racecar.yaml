@@ -1,0 +1,80 @@
+AckermannPlannerROS:
+
+# Robot Configuration Parameters
+  # max_vel_x: 2.0
+  min_vel_x: -2.0
+
+  max_vel_y: 0.0
+  min_vel_y: 0.0
+
+# The velocity when robot is moving in a straight line
+  max_trans_vel:  2.0
+  min_trans_vel:  -2.0
+
+  # max_vel_theta: 0.78
+  min_vel_theta: -0.78
+
+  acc_lim_x: 2.5
+  acc_lim_y: 0.0
+  acc_lim_theta: 0.50 
+
+# Goal Tolerance Parametes
+  xy_goal_tolerance: 0.05
+  yaw_goal_tolerance: 0.17
+  # latch_xy_goal_tolerance: false
+
+# Forward Simulation Parameters
+  sim_time: 3
+  vx_samples: 20
+  vy_samples: 0
+  vth_samples: 40
+  controller_frequency: 10.0
+
+# Trajectory Scoring Parameters
+  # path_distance_bias: 32.0
+  goal_distance_bias: 20.0
+  occdist_scale: 0.02
+  vertical_scale: 10.0
+  direction_scale: 20.0
+  turning_scale: 30.0
+  forward_point_distance: 0.325
+  stop_time_buffer: 0.2
+  scaling_speed: 0.25
+  # max_scaling_factor: 0.2
+
+# Oscillation Prevention Parameters
+  oscillation_reset_dist: 0.05
+
+# Debugging
+  publish_traj_pc : True
+  publish_cost_grid_pc: true
+
+# Fixed param for racecar
+  wheel_base: 0.335
+
+  global_frame_id: /map
+
+# Ackermann Config
+  ack_vel_max: 0.3
+  # ack_vel_min: -0.3
+  ack_acc_max: 1.0
+  # ack_steer_angle_max: 0.785
+  ack_steer_angle_min: -0.785
+  ack_steer_speed_max: 1.0
+  ack_steer_speed_min: -1.0
+  ack_steer_acc_max: 0.36
+  ack_axis_distance: 1.65
+  sim_time: 10.0
+  sim_granularity: 0.025
+  pdist_scale: 0.6
+  gdist_scale: 0.8
+  occdist_scale: 0.01
+  hdiff_scale: 1.0
+  heading_points: 8
+  vx_samples: 20
+  vtheta_samples: 20
+  simple_attractor:
+  angular_sim_granularity: False
+  xy_goal_tolerance: 0.5
+  heading_goal_tolerance: 0.1
+  restore_defaults: False

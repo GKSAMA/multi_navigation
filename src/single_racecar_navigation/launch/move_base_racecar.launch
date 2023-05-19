@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- <include file="$(find single_racecar_navigation)/launch/movebase/racecar/move_base_namespace_dwa.launch"> -->
+  <include file="$(find single_racecar_navigation)/launch/movebase/racecar/move_base_namespace_ackermann.launch">
+  <!-- <include file="$(find single_racecar_navigation)/launch/movebase/racecar/move_base_namespace_teb.launch"> -->
+  <arg name="robot_namespace" value="racecar_0" />
+  <arg name="model" value="racecar" />
+  </include>
+</launch>

@@ -1,0 +1,7 @@
+<library path="lib/libsmooth_global_planner">
+  <class name="smooth_global_planner/SmoothGlobalPlanner" type="smooth_global_planner::SmoothGlobalPlanner" base_class_type="nav_core::BaseGlobalPlanner">
+    <description>
+      A implementation of a grid based planner using Dijkstras or A*
+    </description>
+  </class>
+</library>

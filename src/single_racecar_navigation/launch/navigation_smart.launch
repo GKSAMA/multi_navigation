@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="smart_0_init_x" default="6.5"/>
+  <arg name="smart_0_init_y" default="3.3245"/>
+  <arg name="smart_0_init_a" default="0.0"/>
+
+  <!-- Default value for location of map config file -->
+  <!-- <arg name="map_file" default="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/map/simple_parking_space_with_house.yaml"/> -->
+  <!-- <arg name="map_file" default="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/map/plane.yaml"/> -->
+  <arg name="map_file" default="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/map/plane_tiny.yaml"/>
+  <!-- <arg name="map_file" default="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/map/testmap1.yaml"/> -->
+  <!-- <arg name="map_file" default="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/map/simple_parking_space_with_house.yaml"/> -->
+  <arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find single_racecar_navigation)/models/smartcar/urdf/smart.xacro'" />
+
+  <!-- Loads robot_description to parameter server from URDF file-->
+  <param name="robot_description" command="$(arg urdf_file)" />
+
+  <!-- Map Server -->
+  <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+
+  <arg name="first_robot" value="smart_0"/>
+  <!-- First Robot -->
+  <group ns="smart_0">
+
+    <!-- Robot State Publisher -->
+    <!-- <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="tb3_0"/>
+    </node> -->
+
+
+    <!-- <node pkg="tf" type="static_transform_publisher" name="velodyne_to_front_laser" args="0 0 0 0 0 0 /$(arg first_robot)/velodyne /$(arg first_robot)/base_scan 100" />
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+        <remap from="cloud_in" to="/$(arg first_robot)/pointsCloud"/>
+        <remap from="scan" to="/$(arg first_robot)/scan"/>
+        <rosparam>
+            transform_tolerance: 0.01
+            min_height: -1.0
+            max_height: 1.0
+
+            angle_min: -3.1416
+            angle_max: 3.1416
+            angle_increment: 0.0087
+            scan_time: 0.1
+            range_min: 0.1
+            range_max: 20.0
+            use_inf: true
+            concurrency_level: 0
+        </rosparam>
+    </node> -->
+
+
+    <!-- AMCL -->
+    <!-- <node pkg="amcl" type="amcl" name="amcl"> -->
+      <!-- Load default parameters for turtlebot -->
+      <!-- <rosparam file="$(find single_racecar_navigation)/param/smart/amcl_params.yaml" command="load" /> -->
+      <!-- <param name="initial_pose_x" value="$(arg smart_0_init_x)"/> -->
+      <!-- <param name="initial_pose_y" value="$(arg smart_0_init_y)"/> -->
+      <!-- <param name="initial_pose_a" value="$(arg smart_0_init_a)"/> -->
+
+      <!-- <param name="odom_frame_id"  value="/$(arg first_robot)/odom"/> -->
+      <!-- <param name="base_frame_id"  value="/$(arg first_robot)/base_link"/> -->
+      <!-- <param name="global_frame_id"  value="/smart_0/odom"/> -->
+
+      <!-- Use the single map server -->
+      <!-- <remap from="static_map" to="/static_map"/> -->
+
+      <!-- <param name="use_map_topic" value="true"/> -->
+    <!-- </node> -->
+    
+    <!-- localization -->
+    <node name="fake_localization" pkg="fake_localization" type="fake_localization" respawn="false" output="screen">
+      <param name="global_frame_id" value="map"/>
+      <param name="odom_frame_id" value="$(arg first_robot)/odom"/>
+      <param name="base_frame_id" value="$(arg first_robot)/base_link"/>
+
+      <remap from="base_pose_ground_truth" to="/$(arg first_robot)/odom"/>
+    </node>
+  </group>
+
+  <!-- RVIZ configured for tb3_0/1 -->
+  <node pkg="rviz" type="rviz" name="rviz" required="true"
+         args="-d $(find single_racecar_navigation)/rviz/smart.rviz"/>
+  
+</launch>

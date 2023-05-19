@@ -1,0 +1,22 @@
+SmootherConfig:
+  weight_fem_pos_deviation: 10000000.0 #10000000000.0
+  weight_ref_deviation: 100.0 #1.0
+  weight_path_length: 1.0
+  apply_curvature_constraint: false # false
+  weight_curvature_constraint_slack_var: 100.0
+  curvature_constraint: 0.2
+  use_sqp: false
+  sqp_ftol: 0.0001
+  sqp_ctol: 0.001
+  sqp_pen_max_iter: 10
+  sqp_sub_max_iter: 100
+  max_iter: 500
+  time_limit: 0.0
+  verbose: false
+  scaled_termination: true
+  warm_start: true
+  print_level: 0
+  max_num_of_iterations: 5000
+  acceptable_num_of_iterations: 15
+  tol: 0.00000001
+  acceptable_tol: 0.1

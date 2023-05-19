@@ -1,0 +1,2 @@
+cd math
+protoc --proto_path=. --cpp_out=. smoother_config.proto

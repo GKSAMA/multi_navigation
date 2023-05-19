@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Command Line Arguments -->
+  <arg name="racecar_0_init_x" default="5.5"/>
+  <arg name="racecar_0_init_y" default="44.0"/>
+  <arg name="racecar_0_init_a" default="0.0"/>
+
+  <!-- Default value for location of map config file -->
+  <!-- <arg name="map_file" default="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/models/aaai94maze/maze1.yaml"/> -->
+  <arg name="map_file" default="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/map/plane_tiny.yaml"/>
+  <!-- <arg name="map_file" default="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/models/park/park.yaml"/> -->
+  <!-- <arg name="map_file" default="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/models/single_parking_space/single_parking_space.yaml"/> -->
+  <!-- <arg name="map_file" default="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/models/parallel_parking_space/parallel_parking_space.yaml"/> -->
+  <arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find racecar_description)/urdf/racecar.urdf.xacro'" />
+
+  <!-- Loads robot_description to parameter server from URDF file-->
+  <param name="robot_description" command="$(arg urdf_file)" />
+
+  <!-- Map Server -->
+  <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+
+  <!-- First Robot -->
+  <group ns="racecar_0">
+
+    <node name="fake_localization" pkg="fake_localization" type="fake_localization" respawn="false" output="screen">
+      <param name="global_frame_id" value="map"/>
+      <param name="odom_frame_id" value="racecar_0/odom"/>
+      <param name="base_frame_id" value="racecar_0/base_footprint"/>
+
+      <remap from="base_pose_ground_truth" to="/racecar_0/odom"/>
+    </node>
+
+  </group>
+
+  <!-- RVIZ configured for tb3_0/1 -->
+  <node pkg="rviz" type="rviz" name="rviz" required="true"
+         args="-d $(find single_racecar_navigation)/rviz/racecars.rviz"/>
+  
+</launch>

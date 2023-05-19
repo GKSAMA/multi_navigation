@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+<include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/models/aaai94maze/94AAAIMAZE.world"/> -->
+    <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/worlds/simple_parking_space_with_house_and_car.world"/>
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/worlds/plane_with_obs.world"/> -->
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+</include>
+</launch>

@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="model" default="racecar" doc="ackermann structure"/>
+  <arg name="first_car"  default="f1tenth_0"/>
+
+  <!-- test config -->
+  <arg name="first_car_x_pos" default="15.0"/>
+  <arg name="first_car_y_pos" default="10.0"/>
+  <arg name="first_car_z_pos" default="0.00"/>
+  <arg name="first_car_yaw"   default="0.0"/>
+
+  <param name="pos_x" value="$(arg first_car_x_pos)"/>
+  <param name="pos_y" value="$(arg first_car_y_pos)"/>
+  <param name="pos_z" value="$(arg first_car_z_pos)"/>
+  <param name="pos_yaw" value="$(arg first_car_yaw)"/>
+  <param name="robotName" value="$(arg first_car)"/>
+  <param name="vel_x" value="-0.3"/>
+  <param name="vel_th" value="0.785"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/worlds/vertical_parking_row.world"/> -->
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/worlds/parallel_parking_row.world"/> -->
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/worlds/simple_parking_space_with_house.world"/> -->
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/worlds/simple_parking_space_with_house_and_car.world"/> -->
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/worlds/simple_parking_space_with_house_and_car_parallel.world"/> -->
+    <!-- <arg name="world_name" value="/home/gk/Documents/multi_turtlebot3_navigation/src/single_racecar_navigation/worlds/plane_with_obs.world"/> -->
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="headless" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>  
+
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find single_racecar_navigation)/models/f1tenth/racecar.xacro'" />
+  <group ns = "$(arg first_car)">
+    <!-- <param name="tf_prefix" value="tf1"/> -->
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find single_racecar_navigation)/models/f1tenth/racecar.xacro'" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="$(arg first_car)" />
+    </node>
+    
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg first_car) -x $(arg first_car_x_pos) -y $(arg first_car_y_pos) -z $(arg first_car_z_pos) -Y $(arg first_car_yaw) -param robot_description" />
+    
+    <rosparam file="$(find single_racecar_navigation)/config/smart_control_config.yaml" command="load"/>
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+            output="screen" ns="/$(arg first_car)" args="joint_state_controller 
+            rear_right_velocity_controller rear_left_velocity_controller 
+            front_right_steering_position_controller front_left_steering_position_controller"/>
+
+
+    <node name="gazebo_odometry_$(arg first_car)" pkg="single_racecar_navigation" type="gazebo_odometry_f1tenth.py" 
+          args="--namespace=/$(arg first_car) --x=$(arg first_car_x_pos) --y=$(arg first_car_y_pos) --z=$(arg first_car_z_pos) --th=$(arg first_car_yaw)" output="screen"/>
+    <node name="$(arg first_car)_nav_sim" pkg="single_racecar_navigation" type="nav_sim.py" args="--namespace=/$(arg first_car)" output="screen"/>
+    <!-- <node name="$(arg first_car)_servo_commands" pkg="single_racecar_navigation" type="servo_commands.py" args="--><!--namespace=/$(arg first_car)" /> -->
+    <node name="$(arg first_car)_cmdvel2gazebo" pkg="single_racecar_navigation" type="cmdvel2gazebo_f1tenth.py" args="--namespace=/$(arg first_car)" output="screen"/>
+    <node name="$(arg first_car)_footprint" pkg="single_racecar_navigation" type="footprint_draw.py" args="--namespace=/$(arg first_car)" output="screen"/>
+  
+    <node pkg="tf" type="static_transform_publisher" name="velodyne_to_front_laser" args="0 0 0 0 0 0 /$(arg first_car)/velodyne /$(arg first_car)/base_scan 100" />
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+        <remap from="cloud_in" to="/$(arg first_car)/pointsCloud"/>
+        <remap from="scan" to="/$(arg first_car)/scan"/>
+        <rosparam>
+            transform_tolerance: 0.01
+            min_height: -1.0
+            max_height: 1.0
+
+            angle_min: -3.1416
+            angle_max: 3.1416
+            angle_increment: 0.0087
+            scan_time: 0.1
+            range_min: 0.1
+            range_max: 20.0
+            use_inf: true
+            concurrency_level: 0
+        </rosparam>
+    </node>
+  </group>
+
+</launch>

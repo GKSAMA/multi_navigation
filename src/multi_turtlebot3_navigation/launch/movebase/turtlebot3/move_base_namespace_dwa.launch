@@ -38,6 +38,7 @@
 	     value="$(arg robot_namespace)/base_footprint"/>
        
       <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+      <param name="GlobalPlanner/use_dijkstra" value="false"/>
       <param name="planner_frequency" value="1.0" />
       <param name="planner_patience" value="5.0" />
 
